@@ -549,8 +549,6 @@ export function PricingManagement() {
       </DialogContent>
     </Dialog>
 
-      </Tabs>
-
       <ConfirmDialog
         open={confirmDialog.open}
         onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}
