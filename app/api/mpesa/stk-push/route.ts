@@ -9,7 +9,7 @@ async function getMpesaAccessToken(): Promise<string> {
   const consumerSecret = process.env.MPESA_CONSUMER_SECRET
   const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64")
 
-  const response = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
+  const response = await fetch("https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
     headers: {
       Authorization: `Basic ${auth}`,
     },
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     const passkey = process.env.MPESA_PASSKEY
     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString("base64")
 
-    const stkPushResponse = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
+    const stkPushResponse = await fetch("https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -112,10 +112,10 @@ export async function POST(request: NextRequest) {
         BusinessShortCode: shortcode,
         Password: password,
         Timestamp: timestamp,
-        TransactionType: "CustomerPayBillOnline",
+        TransactionType: "CustomerBuyGoodsOnline",
         Amount: amount,
         PartyA: phoneNumber,
-        PartyB: shortcode,
+        PartyB: 5679822,
         PhoneNumber: phoneNumber,
         CallBackURL: `${process.env.NEXT_PUBLIC_APP_URL}/api/mpesa/callback`,
         AccountReference: accountReference,
