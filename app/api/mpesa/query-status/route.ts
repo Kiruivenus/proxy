@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
         // Payment Successful
         if (type === "topup" && topUp) {
           const lockResult = await db.collection<TopUp>("topups").updateOne(
-            { _id: topUp._id, status: "pending" },
+            { _id: topUp._id, status: { $nin: ["completed", "processing_payment"] } },
             { $set: { status: "processing_payment" } }
           )
 
@@ -202,7 +202,7 @@ export async function GET(request: NextRequest) {
         
         else if (type === "proxy" && order) {
           const lockResult = await db.collection<Order>("orders").updateOne(
-            { _id: order._id, status: "pending" },
+            { _id: order._id, status: { $nin: ["paid", "completed", "processing_payment"] } },
             { $set: { status: "processing_payment" } }
           )
 
@@ -280,7 +280,7 @@ export async function GET(request: NextRequest) {
         
         else if (type === "email" && emailOrder) {
           const lockResult = await db.collection("emailOrders").updateOne(
-            { _id: emailOrder._id, status: "pending" },
+            { _id: emailOrder._id, status: { $nin: ["paid", "processing_payment"] } },
             { $set: { status: "processing_payment" } }
           )
 
@@ -367,7 +367,7 @@ export async function GET(request: NextRequest) {
         // Payment Failed (e.g. Cancelled, Timeout)
         if (type === "topup" && topUp) {
           const lockResult = await db.collection<TopUp>("topups").updateOne(
-            { _id: topUp._id, status: "pending" },
+            { _id: topUp._id, status: { $nin: ["completed", "processing_payment"] } },
             { $set: { status: "failed", failureReason: resultDesc } }
           )
           if (lockResult.modifiedCount === 0) {
@@ -380,7 +380,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({ status: "failed", error: resultDesc })
         } else if (type === "proxy" && order) {
           const lockResult = await db.collection<Order>("orders").updateOne(
-            { _id: order._id, status: "pending" },
+            { _id: order._id, status: { $nin: ["paid", "completed", "processing_payment"] } },
             { $set: { status: "failed", failureReason: resultDesc } }
           )
           if (lockResult.modifiedCount === 0) {
@@ -393,7 +393,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.json({ status: "failed", error: resultDesc })
         } else if (type === "email" && emailOrder) {
           const lockResult = await db.collection("emailOrders").updateOne(
-            { _id: emailOrder._id, status: "pending" },
+            { _id: emailOrder._id, status: { $nin: ["paid", "processing_payment"] } },
             { $set: { status: "failed", failureReason: resultDesc } }
           )
           if (lockResult.modifiedCount === 0) {

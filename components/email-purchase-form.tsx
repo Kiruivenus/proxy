@@ -217,7 +217,7 @@ export function EmailPurchaseForm() {
         if (attempts >= maxAttempts) {
           clearInterval(pollInterval)
           setPaymentStatus("failed")
-          setError("Payment timeout. Please try again.")
+          setError("Payment timeout. If money was deducted, please check your dashboard as it may take a few moments to process.")
           setSubmitting(false)
           return
         }
@@ -236,7 +236,7 @@ export function EmailPurchaseForm() {
           } else if (statusData.status === "failed") {
             clearInterval(pollInterval)
             setPaymentStatus("failed")
-            setError(statusData.error || "Payment failed. Please try again.")
+            setError(statusData.error || "Payment failed. If money was deducted, please check your dashboard as it may take a few moments to process.")
             setSubmitting(false)
           }
         } catch {

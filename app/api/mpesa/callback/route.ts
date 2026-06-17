@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     if (order) {
       if (ResultCode === 0) {
         const lockResult = await db.collection<Order>("orders").updateOne(
-          { _id: order._id, status: "pending" },
+          { _id: order._id, status: { $nin: ["paid", "completed", "processing_payment"] } },
           { $set: { status: "processing_payment" } }
         )
 
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
         )
       } else {
         await db.collection<Order>("orders").updateOne(
-          { _id: order._id, status: "pending" },
+          { _id: order._id, status: { $nin: ["paid", "completed", "processing_payment"] } },
           {
             $set: {
               status: "failed",
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
       // Handle top-up payment
       if (ResultCode === 0) {
         const lockResult = await db.collection<TopUp>("topups").updateOne(
-          { _id: topUp._id, status: "pending" },
+          { _id: topUp._id, status: { $nin: ["completed", "processing_payment"] } },
           { $set: { status: "processing_payment" } }
         )
 
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
         )
       } else {
         await db.collection<TopUp>("topups").updateOne(
-          { _id: topUp._id, status: "pending" },
+          { _id: topUp._id, status: { $nin: ["completed", "processing_payment"] } },
           {
             $set: {
               status: "failed",
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
       if (emailOrder) {
         if (ResultCode === 0) {
           const lockResult = await db.collection("emailOrders").updateOne(
-            { _id: emailOrder._id, status: "pending" },
+            { _id: emailOrder._id, status: { $nin: ["paid", "processing_payment"] } },
             { $set: { status: "processing_payment" } }
           )
 
@@ -262,7 +262,7 @@ export async function POST(request: NextRequest) {
           }
         } else {
           await db.collection("emailOrders").updateOne(
-            { _id: emailOrder._id, status: "pending" },
+            { _id: emailOrder._id, status: { $nin: ["paid", "processing_payment"] } },
             {
               $set: {
                 status: "failed",
