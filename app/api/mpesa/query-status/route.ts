@@ -71,7 +71,6 @@ async function findAvailableProxyForCallback(db: Db, country: string, userId: Ob
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireAuth()
     const { searchParams } = new URL(request.url)
     const checkoutRequestId = searchParams.get("checkoutRequestId")
     const type = searchParams.get("type") // "topup", "proxy", "email"
@@ -89,24 +88,21 @@ export async function GET(request: NextRequest) {
 
     if (type === "topup") {
       topUp = await db.collection<TopUp>("topups").findOne({
-        mpesaCheckoutRequestId: checkoutRequestId,
-        userId: user._id
+        mpesaCheckoutRequestId: checkoutRequestId
       })
       if (topUp && topUp.status !== "pending") {
         return NextResponse.json({ status: topUp.status, receiptNumber: topUp.mpesaReceiptNumber })
       }
     } else if (type === "proxy") {
       order = await db.collection<Order>("orders").findOne({
-        mpesaCheckoutRequestId: checkoutRequestId,
-        userId: user._id
+        mpesaCheckoutRequestId: checkoutRequestId
       })
       if (order && order.status !== "pending") {
         return NextResponse.json({ status: order.status, receiptNumber: order.mpesaReceiptNumber })
       }
     } else if (type === "email") {
       emailOrder = await db.collection("emailOrders").findOne({
-        mpesaCheckoutRequestId: checkoutRequestId,
-        userId: user._id
+        mpesaCheckoutRequestId: checkoutRequestId
       })
       if (emailOrder && emailOrder.status !== "pending") {
         return NextResponse.json({ status: emailOrder.status, receiptNumber: emailOrder.mpesaReceiptNumber })
@@ -306,6 +302,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ status: "pending" })
   } catch (error: any) {
+    console.error("query-status caught error:", error);
     if (error.message === "Unauthorized" || error.message === "Forbidden" || error.message.includes("vercel resources exceeded")) {
       return NextResponse.json({ error: error.message }, { status: error.message === "Unauthorized" ? 401 : 403 })
     }
