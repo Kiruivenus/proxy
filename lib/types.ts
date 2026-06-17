@@ -43,7 +43,7 @@ export interface Order {
   paymentMethod: "mpesa" | "balance"
   mpesaCheckoutRequestId?: string
   mpesaReceiptNumber?: string
-  status: "pending" | "paid" | "failed" | "cancelled" | "expired"
+  status: "pending" | "paid" | "failed" | "cancelled" | "expired" | "processing_payment"
   failureReason?: string
   createdAt: Date
   paidAt?: Date
@@ -57,7 +57,7 @@ export interface TopUp {
   phoneNumber: string
   mpesaCheckoutRequestId?: string
   mpesaReceiptNumber?: string
-  status: "pending" | "completed" | "failed"
+  status: "pending" | "completed" | "failed" | "processing_payment"
   failureReason?: string
   createdAt: Date
   completedAt?: Date
@@ -127,7 +127,7 @@ export interface EmailOrder {
   paymentMethod: "mpesa" | "balance"
   mpesaCheckoutRequestId?: string
   mpesaReceiptNumber?: string
-  status: "pending" | "paid" | "failed" | "cancelled"
+  status: "pending" | "paid" | "failed" | "cancelled" | "processing_payment"
   failureReason?: string
   createdAt: Date
   paidAt?: Date

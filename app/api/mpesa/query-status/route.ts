@@ -91,21 +91,30 @@ export async function GET(request: NextRequest) {
         mpesaCheckoutRequestId: checkoutRequestId
       })
       if (topUp && topUp.status !== "pending") {
-        return NextResponse.json({ status: topUp.status, receiptNumber: topUp.mpesaReceiptNumber })
+        return NextResponse.json({
+          status: topUp.status === "processing_payment" ? "pending" : topUp.status,
+          receiptNumber: topUp.mpesaReceiptNumber
+        })
       }
     } else if (type === "proxy") {
       order = await db.collection<Order>("orders").findOne({
         mpesaCheckoutRequestId: checkoutRequestId
       })
       if (order && order.status !== "pending") {
-        return NextResponse.json({ status: order.status, receiptNumber: order.mpesaReceiptNumber })
+        return NextResponse.json({
+          status: order.status === "processing_payment" ? "pending" : order.status,
+          receiptNumber: order.mpesaReceiptNumber
+        })
       }
     } else if (type === "email") {
       emailOrder = await db.collection("emailOrders").findOne({
         mpesaCheckoutRequestId: checkoutRequestId
       })
       if (emailOrder && emailOrder.status !== "pending") {
-        return NextResponse.json({ status: emailOrder.status, receiptNumber: emailOrder.mpesaReceiptNumber })
+        return NextResponse.json({
+          status: emailOrder.status === "processing_payment" ? "pending" : emailOrder.status,
+          receiptNumber: emailOrder.mpesaReceiptNumber
+        })
       }
     }
 
@@ -164,6 +173,19 @@ export async function GET(request: NextRequest) {
       if (resultCode === 0) {
         // Payment Successful
         if (type === "topup" && topUp) {
+          const lockResult = await db.collection<TopUp>("topups").updateOne(
+            { _id: topUp._id, status: "pending" },
+            { $set: { status: "processing_payment" } }
+          )
+
+          if (lockResult.modifiedCount === 0) {
+            const dbTopUp = await db.collection<TopUp>("topups").findOne({ _id: topUp._id })
+            return NextResponse.json({
+              status: dbTopUp?.status === "processing_payment" ? "pending" : dbTopUp?.status,
+              receiptNumber: dbTopUp?.mpesaReceiptNumber
+            })
+          }
+
           await db.collection("users").updateOne({ _id: topUp.userId }, { $inc: { balance: topUp.amount } })
           await db.collection<TopUp>("topups").updateOne(
             { _id: topUp._id },
@@ -179,6 +201,35 @@ export async function GET(request: NextRequest) {
         } 
         
         else if (type === "proxy" && order) {
+          const lockResult = await db.collection<Order>("orders").updateOne(
+            { _id: order._id, status: "pending" },
+            { $set: { status: "processing_payment" } }
+          )
+
+          if (lockResult.modifiedCount === 0) {
+            const dbOrder = await db.collection<Order>("orders").findOne({ _id: order._id })
+            return NextResponse.json({
+              status: dbOrder?.status === "processing_payment" ? "pending" : dbOrder?.status,
+              receiptNumber: dbOrder?.mpesaReceiptNumber
+            })
+          }
+
+          // Double check database status to avoid race conditions with callback
+          const dbOrder = await db.collection<Order>("orders").findOne({ _id: order._id })
+          if (dbOrder && dbOrder.status === "paid") {
+            return NextResponse.json({ status: "paid", receiptNumber: dbOrder.mpesaReceiptNumber })
+          }
+
+          // Check if a purchase already exists for this order (callback completed first)
+          const existingPurchase = await db.collection<ProxyPurchase>("purchases").findOne({ orderId: order._id })
+          if (existingPurchase) {
+            await db.collection<Order>("orders").updateOne(
+              { _id: order._id },
+              { $set: { status: "paid", mpesaReceiptNumber: receiptNumber, paidAt: new Date() } }
+            )
+            return NextResponse.json({ status: "paid", receiptNumber })
+          }
+
           const selectedProxy = await findAvailableProxyForCallback(db, order.country, order.userId)
           let proxy = null
           if (selectedProxy) {
@@ -228,6 +279,35 @@ export async function GET(request: NextRequest) {
         } 
         
         else if (type === "email" && emailOrder) {
+          const lockResult = await db.collection("emailOrders").updateOne(
+            { _id: emailOrder._id, status: "pending" },
+            { $set: { status: "processing_payment" } }
+          )
+
+          if (lockResult.modifiedCount === 0) {
+            const dbEmailOrder = await db.collection("emailOrders").findOne({ _id: emailOrder._id })
+            return NextResponse.json({
+              status: dbEmailOrder?.status === "processing_payment" ? "pending" : dbEmailOrder?.status,
+              receiptNumber: dbEmailOrder?.mpesaReceiptNumber
+            })
+          }
+
+          // Double check database status to avoid race conditions with callback
+          const dbEmailOrder = await db.collection("emailOrders").findOne({ _id: emailOrder._id })
+          if (dbEmailOrder && dbEmailOrder.status === "paid") {
+            return NextResponse.json({ status: "paid", receiptNumber: dbEmailOrder.mpesaReceiptNumber })
+          }
+
+          // Check if an email purchase already exists for this order
+          const existingEmailPurchase = await db.collection("emailPurchases").findOne({ orderId: emailOrder._id })
+          if (existingEmailPurchase) {
+            await db.collection("emailOrders").updateOne(
+              { _id: emailOrder._id },
+              { $set: { status: "paid", mpesaReceiptNumber: receiptNumber, paidAt: new Date() } }
+            )
+            return NextResponse.json({ status: "paid", receiptNumber })
+          }
+
           const availableEmails = await db
             .collection("emails")
             .find({
@@ -286,22 +366,43 @@ export async function GET(request: NextRequest) {
       } else if (resultCode !== null) {
         // Payment Failed (e.g. Cancelled, Timeout)
         if (type === "topup" && topUp) {
-          await db.collection<TopUp>("topups").updateOne(
-            { _id: topUp._id },
+          const lockResult = await db.collection<TopUp>("topups").updateOne(
+            { _id: topUp._id, status: "pending" },
             { $set: { status: "failed", failureReason: resultDesc } }
           )
+          if (lockResult.modifiedCount === 0) {
+            const dbTopUp = await db.collection<TopUp>("topups").findOne({ _id: topUp._id })
+            return NextResponse.json({
+              status: dbTopUp?.status === "processing_payment" ? "pending" : dbTopUp?.status,
+              receiptNumber: dbTopUp?.mpesaReceiptNumber
+            })
+          }
           return NextResponse.json({ status: "failed", error: resultDesc })
         } else if (type === "proxy" && order) {
-          await db.collection<Order>("orders").updateOne(
-            { _id: order._id },
+          const lockResult = await db.collection<Order>("orders").updateOne(
+            { _id: order._id, status: "pending" },
             { $set: { status: "failed", failureReason: resultDesc } }
           )
+          if (lockResult.modifiedCount === 0) {
+            const dbOrder = await db.collection<Order>("orders").findOne({ _id: order._id })
+            return NextResponse.json({
+              status: dbOrder?.status === "processing_payment" ? "pending" : dbOrder?.status,
+              receiptNumber: dbOrder?.mpesaReceiptNumber
+            })
+          }
           return NextResponse.json({ status: "failed", error: resultDesc })
         } else if (type === "email" && emailOrder) {
-          await db.collection("emailOrders").updateOne(
-            { _id: emailOrder._id },
+          const lockResult = await db.collection("emailOrders").updateOne(
+            { _id: emailOrder._id, status: "pending" },
             { $set: { status: "failed", failureReason: resultDesc } }
           )
+          if (lockResult.modifiedCount === 0) {
+            const dbEmailOrder = await db.collection("emailOrders").findOne({ _id: emailOrder._id })
+            return NextResponse.json({
+              status: dbEmailOrder?.status === "processing_payment" ? "pending" : dbEmailOrder?.status,
+              receiptNumber: dbEmailOrder?.mpesaReceiptNumber
+            })
+          }
           return NextResponse.json({ status: "failed", error: resultDesc })
         }
       }

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getDb } from "@/lib/mongodb"
 import { type Db, ObjectId } from "mongodb"
-import type { Order, Proxy, ProxyPurchase, TopUp } from "@/lib/types"
+import type { Order, Proxy, ProxyPurchase, TopUp, EmailOrder } from "@/lib/types"
 
 async function findAvailableProxyForCallback(db: Db, country: string, userId: ObjectId) {
   const userPurchases = await db
@@ -81,6 +81,16 @@ export async function POST(request: NextRequest) {
 
     if (order) {
       if (ResultCode === 0) {
+        const lockResult = await db.collection<Order>("orders").updateOne(
+          { _id: order._id, status: "pending" },
+          { $set: { status: "processing_payment" } }
+        )
+
+        if (lockResult.modifiedCount === 0) {
+          // Already processing or completed
+          return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" })
+        }
+
         const selectedProxy = await findAvailableProxyForCallback(db, order.country, order.userId)
 
         let proxy = null
@@ -131,7 +141,7 @@ export async function POST(request: NextRequest) {
         )
       } else {
         await db.collection<Order>("orders").updateOne(
-          { _id: order._id },
+          { _id: order._id, status: "pending" },
           {
             $set: {
               status: "failed",
@@ -143,6 +153,15 @@ export async function POST(request: NextRequest) {
     } else if (topUp) {
       // Handle top-up payment
       if (ResultCode === 0) {
+        const lockResult = await db.collection<TopUp>("topups").updateOne(
+          { _id: topUp._id, status: "pending" },
+          { $set: { status: "processing_payment" } }
+        )
+
+        if (lockResult.modifiedCount === 0) {
+          return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" })
+        }
+
         // Add balance to user
         await db.collection("users").updateOne({ _id: topUp.userId }, { $inc: { balance: topUp.amount } })
 
@@ -158,7 +177,7 @@ export async function POST(request: NextRequest) {
         )
       } else {
         await db.collection<TopUp>("topups").updateOne(
-          { _id: topUp._id },
+          { _id: topUp._id, status: "pending" },
           {
             $set: {
               status: "failed",
@@ -169,12 +188,21 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Handle email order payment
-      const emailOrder = await db.collection("emailOrders").findOne({
+      const emailOrder = await db.collection<EmailOrder>("emailOrders").findOne({
         mpesaCheckoutRequestId: CheckoutRequestID,
       })
 
       if (emailOrder) {
         if (ResultCode === 0) {
+          const lockResult = await db.collection("emailOrders").updateOne(
+            { _id: emailOrder._id, status: "pending" },
+            { $set: { status: "processing_payment" } }
+          )
+
+          if (lockResult.modifiedCount === 0) {
+            return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" })
+          }
+
           // Get available emails for the domain
           const availableEmails = await db
             .collection("emails")
@@ -234,7 +262,7 @@ export async function POST(request: NextRequest) {
           }
         } else {
           await db.collection("emailOrders").updateOne(
-            { _id: emailOrder._id },
+            { _id: emailOrder._id, status: "pending" },
             {
               $set: {
                 status: "failed",
