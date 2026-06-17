@@ -141,10 +141,23 @@ export async function GET(request: NextRequest) {
     const stkData = await queryResponse.json()
     console.log("Safaricom STK Query Response:", JSON.stringify(stkData, null, 2))
 
-    // Safaricom response handles
     const resultCode = stkData.ResultCode !== undefined ? Number(stkData.ResultCode) : null
-    const resultDesc = stkData.ResultDesc || stkData.ResponseDescription || "Transaction Status Query Failed"
+    const resultDesc = stkData.ResultDesc || stkData.ResponseDescription || stkData.errorMessage || "Transaction Status Query Failed"
     const receiptNumber = "QUERY_" + checkoutRequestId.slice(-8).toUpperCase()
+
+    // Check if the transaction is still processing/pending
+    const isProcessing = 
+      (stkData.errorMessage && typeof stkData.errorMessage === "string" && stkData.errorMessage.toLowerCase().includes("processing")) ||
+      (stkData.ResponseDescription && typeof stkData.ResponseDescription === "string" && stkData.ResponseDescription.toLowerCase().includes("processing")) ||
+      (stkData.ResultDesc && typeof stkData.ResultDesc === "string" && stkData.ResultDesc.toLowerCase().includes("processing")) ||
+      stkData.errorCode === "500.002.01" ||
+      stkData.errorCode === "400.002.02" ||
+      stkData.ResponseCode === "103"
+
+    if (isProcessing) {
+      return NextResponse.json({ status: "pending" })
+    }
+
 
     if (resultCode === 0) {
       // Payment Successful

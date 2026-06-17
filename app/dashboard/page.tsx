@@ -2,7 +2,7 @@ import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Header } from "@/components/header"
 import { DashboardTabs } from "@/components/dashboard-tabs"
-import { LayoutDashboard } from "lucide-react"
+import { Check } from "lucide-react"
 
 export default async function DashboardPage() {
   const session = await getSession()
@@ -23,21 +23,24 @@ export default async function DashboardPage() {
         </div>
 
         <div className="mx-auto max-w-5xl relative z-10">
-          <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-medium mb-4">
-              <LayoutDashboard className="h-4 w-4" />
-              Overview
-            </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 text-foreground">
+          <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h1 className="text-3xl md:text-[36px] font-heading font-bold tracking-tight text-white mb-2 leading-none">
               My Dashboard
             </h1>
-            <p className="text-lg text-muted-foreground">
-              View and manage your active proxies and premium email accounts.
+            <p className="text-sm md:text-base text-zinc-400">
+              Manage your active proxies and premium email accounts.
             </p>
           </div>
 
           <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
             <DashboardTabs />
+          </div>
+
+          <div className="flex items-center justify-center gap-2 mt-12 text-xs text-zinc-500 font-medium animate-in fade-in duration-1000 delay-300">
+            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+              <Check className="h-2.5 w-2.5" />
+            </div>
+            <span>Your privacy and data are always protected.</span>
           </div>
         </div>
       </main>

@@ -71,13 +71,13 @@ export function Header({ user }: HeaderProps) {
           internal error : vercel resources exceeded
         </div>
       )}
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="border-b border-white/[0.08] bg-[#050505]/80 backdrop-blur-md sticky top-0 z-50">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="h-7 w-7 overflow-hidden rounded-lg flex items-center justify-center bg-zinc-900 border border-border/40 p-0.5">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-95 transition-opacity">
+          <div className="h-7 w-7 overflow-hidden rounded-lg flex items-center justify-center bg-zinc-900 border border-white/[0.08] p-0.5">
             <img src="/logo.png" alt="RayProxy" className="h-[145%] w-auto max-w-none object-contain -translate-y-[8%]" />
           </div>
-          <span className="text-xl font-bold">RayProxy Hub</span>
+          <span className="text-xl font-bold tracking-tight text-white">RayProxy Hub</span>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
@@ -102,10 +102,10 @@ export function Header({ user }: HeaderProps) {
             <>
               <Link
                 href="/topup"
-                className="flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent/20"
+                className="flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-sm font-semibold text-green-400 transition-all hover:bg-green-500/20 hover:border-green-500/30"
               >
-                <Wallet className="h-4 w-4" />
-                KES {balance.toLocaleString()}
+                <span>💰</span>
+                <span>KES {balance.toFixed(2)}</span>
               </Link>
               <Link href="/dashboard" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                 Dashboard
@@ -188,10 +188,10 @@ export function Header({ user }: HeaderProps) {
           {user && (
             <Link
               href="/topup"
-              className="flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:bg-accent/20"
+              className="flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-sm font-semibold text-green-400 transition-all hover:bg-green-500/20 hover:border-green-500/30"
             >
-              <Wallet className="h-4 w-4" />
-              <span>KES {balance.toLocaleString()}</span>
+              <span>💰</span>
+              <span>KES {balance.toFixed(2)}</span>
             </Link>
           )}
           <Sheet open={open} onOpenChange={setOpen}>
