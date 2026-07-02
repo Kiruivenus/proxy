@@ -56,8 +56,50 @@ export function ProxyCard({ proxy, isExpired = false }: ProxyCardProps) {
 
   const getFlagEmoji = (countryCode: string) => {
     if (!countryCode) return "🌐"
-    const codePoints = countryCode
-      .toUpperCase()
+    
+    let code = countryCode.trim().toUpperCase()
+    
+    // ISO 3166-1 alpha-3 to alpha-2 mapping for common countries
+    const iso3ToIso2: Record<string, string> = {
+      USA: "US",
+      KEN: "KE",
+      GBR: "GB",
+      CAN: "CA",
+      DEU: "DE",
+      FRA: "FR",
+      ITA: "IT",
+      ESP: "ES",
+      JPN: "JP",
+      CHN: "CN",
+      IND: "IN",
+      AUS: "AU",
+      BRA: "BR",
+      RUS: "RU",
+      ZAF: "ZA",
+      NGA: "NG",
+      RWA: "RW",
+      UGA: "UG",
+      TZA: "TZ",
+      BDI: "BI",
+      ETH: "ET",
+      SSD: "SS",
+      SDN: "SD",
+      SOM: "SO",
+      EGY: "EG",
+    }
+    
+    if (code.length === 3 && iso3ToIso2[code]) {
+      code = iso3ToIso2[code]
+    } else {
+      code = code.slice(0, 2)
+    }
+    
+    // Ensure we only have exactly 2 alphabetical characters
+    if (code.length !== 2 || !/^[A-Z]{2}$/.test(code)) {
+      return "🌐"
+    }
+
+    const codePoints = code
       .split("")
       .map((char) => 127397 + char.charCodeAt(0))
     return String.fromCodePoint(...codePoints)
@@ -181,7 +223,7 @@ export function ProxyCard({ proxy, isExpired = false }: ProxyCardProps) {
               <div className="min-w-0">
                 <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Username</p>
                 <p className="font-mono text-xs font-semibold text-white mt-0.5 truncate select-all">
-                  {showCredentials ? (proxy.username || "4afb") : "4afb"}
+                  {proxy.username || "—"}
                 </p>
               </div>
             </div>
@@ -190,7 +232,7 @@ export function ProxyCard({ proxy, isExpired = false }: ProxyCardProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg flex-shrink-0"
-              onClick={() => handleCopy(proxy.username || "4afb", "Username")}
+              onClick={() => handleCopy(proxy.username || "", "Username")}
             >
               <Copy className="h-3.5 w-3.5" />
             </Button>
@@ -205,7 +247,7 @@ export function ProxyCard({ proxy, isExpired = false }: ProxyCardProps) {
               <div className="min-w-0">
                 <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Password</p>
                 <p className="font-mono text-xs font-semibold text-white mt-0.5 select-all">
-                  {showPassword || showCredentials ? (proxy.password || "4afb") : "••••"}
+                  {showPassword || showCredentials ? (proxy.password || "—") : "••••"}
                 </p>
               </div>
             </div>
@@ -224,7 +266,7 @@ export function ProxyCard({ proxy, isExpired = false }: ProxyCardProps) {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg"
-                onClick={() => handleCopy(proxy.password || "4afb", "Password")}
+                onClick={() => handleCopy(proxy.password || "", "Password")}
               >
                 <Copy className="h-3.5 w-3.5" />
               </Button>
