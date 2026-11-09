@@ -67,7 +67,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Create pending order
+    // If paying via wallet balance
+    if (paymentMethod === "balance") {
+      const userBalance = user.balance || 0
+      if (userBalance < totalPrice) {
+        return NextResponse.json({ error: "Insufficient balance. Please top up your wallet." }, { status: 400 })
+      }
+
+      // Deduct balance
+      await db.collection("users").updateOne({ _id: user._id }, { $inc: { balance: -totalPrice } })
+
+      // Assign emails to user
+      const emailIds = availableEmails.map((e) => e._id)
+      await db.collection("emails").updateMany(
+        { _id: { $in: emailIds } },
+        { $set: { status: "assigned", userId: user._id, assignedAt: new Date() } }
+      )
+
+      // Create completed order
+      const order = await db.collection("emailOrders").insertOne({
+        userId: user._id,
+        domainId: new ObjectId(domainId),
+        domain: domain.domain,
+        quantity,
+        pricePerEmail: pricing.pricePerEmail,
+        totalPrice,
+        paymentMethod: "balance",
+        status: "paid",
+        createdAt: new Date(),
+        paidAt: new Date(),
+      })
+
+      return NextResponse.json({
+        orderId: order.insertedId.toString(),
+        status: "paid",
+      })
+    }
+
+    // M-Pesa payment: Create pending order
     const order = await db.collection("emailOrders").insertOne({
       userId: user._id,
       domainId: new ObjectId(domainId),
@@ -83,6 +120,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       orderId: order.insertedId.toString(),
+      status: "pending",
     })
   } catch (error: any) {
     if (error.message.includes("vercel resources exceeded")) {

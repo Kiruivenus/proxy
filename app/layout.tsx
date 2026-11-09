@@ -1,12 +1,14 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter, Plus_Jakarta_Sans } from "next/font/google"
+import { Inter, Plus_Jakarta_Sans, Roboto_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
-const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-heading" })
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" })
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-heading", display: "swap" })
+const robotoMono = Roboto_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" })
 
 
 export const metadata: Metadata = {
@@ -110,17 +112,19 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${inter.variable} ${plusJakarta.variable} font-sans antialiased bg-[#050505] text-zinc-100`}>
-        {children}
-        <Toaster />
-        <Analytics />
+      <body className={`${inter.variable} ${plusJakarta.variable} ${robotoMono.variable} font-sans antialiased bg-background text-foreground min-h-screen transition-colors duration-150`}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          {children}
+          <Toaster />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )

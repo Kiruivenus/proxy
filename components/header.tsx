@@ -4,19 +4,9 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import {
-  Globe,
-  LogOut,
-  Menu,
-  User,
-  Shield,
-  X,
-  Home,
-  ShoppingCart,
-  LayoutDashboard,
-  History,
-  Wallet,
-} from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { NotificationPopover } from "@/components/notification-popover"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,344 +54,415 @@ export function Header({ user }: HeaderProps) {
     router.refresh()
   }
 
+  const userInitial = user?.name
+    ? user.name.trim().charAt(0).toUpperCase()
+    : user?.email
+    ? user.email.trim().charAt(0).toUpperCase()
+    : "U"
+
   return (
     <div className="sticky top-0 z-50">
       {isExpired && (user?.role === "admin" || user?.role === "superadmin") && (
-        <div className="bg-destructive text-destructive-foreground py-2 px-4 text-center font-bold text-sm">
+        <div className="bg-destructive text-destructive-foreground py-1.5 px-4 text-center font-bold text-xs">
           internal error : vercel resources exceeded
         </div>
       )}
-      <header className="border-b border-white/[0.08] bg-[#050505]/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 hover:opacity-95 transition-opacity">
-          <div className="h-7 w-7 overflow-hidden rounded-lg flex items-center justify-center bg-zinc-900 border border-white/[0.08] p-0.5">
-            <img src="/logo.png" alt="RayProxy" className="h-[145%] w-auto max-w-none object-contain -translate-y-[8%]" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-white">RayProxy Hub</span>
-        </Link>
+      <header className="border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-50 transition-colors">
+        <div className="container mx-auto flex h-14 items-center justify-between px-3 sm:px-4">
+          {/* Horizontal Brand Logo */}
+          <Link href="/" className="flex items-center shrink-0 hover:opacity-95 transition-opacity py-0.5">
+            <img
+              src="/logo-horizontal-dark.png"
+              alt="RayProxy"
+              className="h-9 sm:h-10 md:h-11 lg:h-[48px] w-auto object-contain hidden dark:block transition-all"
+            />
+            <img
+              src="/logo-horizontal-light.png"
+              alt="RayProxy"
+              className="h-9 sm:h-10 md:h-11 lg:h-[48px] w-auto object-contain block dark:hidden transition-all"
+            />
+          </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
-          {!user && (
-            <Link href="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-              Home
-            </Link>
-          )}
-          <Link href="/buy" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-            Buy Proxies
-          </Link>
-          <Link href="/buy-emails" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-            Buy Emails
-          </Link>
-          <Link href="/support" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-            Support
-          </Link>
-          <Link href="/docs" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-            Docs
-          </Link>
-          {user ? (
-            <>
-              <Link
-                href="/topup"
-                className="flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-sm font-semibold text-green-400 transition-all hover:bg-green-500/20 hover:border-green-500/30"
-              >
-                <span>💰</span>
-                <span>KES {balance.toFixed(2)}</span>
+          {/* Desktop Navigation */}
+          <nav className="hidden items-center gap-4 lg:gap-5 md:flex">
+            {!user ? (
+              <Link href="/" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
+                Home
               </Link>
-              <Link href="/dashboard" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+            ) : (
+              <Link href="/dashboard" className="text-xs text-muted-foreground transition-colors hover:text-foreground font-medium">
                 Dashboard
               </Link>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <User className="h-4 w-4" />
-                    {user.name}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">My Proxies</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/orders">Order History</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/topup" className="flex items-center gap-2">
-                      <Wallet className="h-4 w-4" />
-                      Top Up Balance
-                    </Link>
-                  </DropdownMenuItem>
-                  {user.role === "admin" && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin" className="flex items-center gap-2">
-                          <Shield className="h-4 w-4" />
-                          Admin Panel
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  {user.role === "superadmin" && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin" className="flex items-center gap-2">
-                          <Shield className="h-4 w-4" />
-                          Admin Panel
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin/settings" className="flex items-center gap-2">
-                          <span className="h-4 w-4">⚙️</span>
-                          Settings
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin/upgrade" className="flex items-center gap-2">
-                          <span className="h-4 w-4">⚡</span>
-                          Upgrade
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href="/register">Sign Up</Link>
-              </Button>
-            </div>
-          )}
-        </nav>
-
-        <div className="flex items-center gap-2 md:hidden">
-          {user && (
-            <Link
-              href="/topup"
-              className="flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-sm font-semibold text-green-400 transition-all hover:bg-green-500/20 hover:border-green-500/30"
-            >
-              <span>💰</span>
-              <span>KES {balance.toFixed(2)}</span>
+            )}
+            <Link href="/buy" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
+              Buy Proxies
             </Link>
-          )}
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] p-0">
-              <div className="flex items-center justify-between border-b border-border bg-accent/5 px-6 py-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-7 w-7 overflow-hidden rounded-lg flex items-center justify-center bg-zinc-900 border border-border/40 p-0.5">
-                    <img src="/logo.png" alt="RayProxy" className="h-[145%] w-auto max-w-none object-contain -translate-y-[8%]" />
-                  </div>
-                  <SheetTitle className="text-lg font-bold text-foreground">RayProxy Hub</SheetTitle>
-                </div>
-                <SheetClose asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <X className="h-4 w-4" />
-                  </Button>
-                </SheetClose>
-              </div>
+            <Link href="/buy-emails" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
+              Buy Emails
+            </Link>
+            <Link href="/support" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
+              Support
+            </Link>
+            <Link href="/docs" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
+              Docs
+            </Link>
 
-              {user && (
-                <div className="border-b border-border bg-accent/10 px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground">
-                      <User className="h-5 w-5" />
+            {user ? (
+              <>
+                <Link
+                  href="/topup"
+                  className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-500 dark:text-emerald-400 transition-all hover:bg-emerald-500/20 hover:border-emerald-500/30 shrink-0"
+                >
+                  <GoogleIcon name="account_balance_wallet" size={13} className="text-emerald-500 dark:text-emerald-400" />
+                  <span>KES {balance.toFixed(2)}</span>
+                </Link>
+
+                <ThemeToggle />
+
+                <NotificationPopover />
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="h-8 w-8 rounded-full border border-border/60 bg-secondary/50 hover:bg-secondary text-foreground transition-all duration-200 flex items-center justify-center shrink-0 outline-none hover:ring-2 hover:ring-blue-500/20"
+                      title="Menu"
+                      aria-label="Toggle user menu"
+                    >
+                      <GoogleIcon name="menu" size={18} className="text-muted-foreground hover:text-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 text-xs p-1 shadow-xl border border-border bg-popover">
+                    <div className="px-2 py-2 border-b border-border/60">
+                      <p className="font-semibold text-foreground truncate">{user.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+                      <div className="mt-1.5 flex items-center justify-between text-[11px] bg-secondary/50 rounded px-2 py-1">
+                        <span className="text-muted-foreground">Balance:</span>
+                        <span className="font-semibold text-emerald-500 dark:text-emerald-400">
+                          KES {balance.toLocaleString()}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                    </div>
-                  </div>
-                  <Link
-                    href="/topup"
-                    onClick={() => setOpen(false)}
-                    className="mt-3 flex items-center justify-between rounded-lg bg-background/50 px-3 py-2"
-                  >
-                    <span className="text-sm text-muted-foreground">Balance</span>
-                    <span className="font-semibold text-accent">KES {balance.toLocaleString()}</span>
-                  </Link>
-                </div>
-              )}
 
-              <nav className="flex flex-col p-4">
-                <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Navigation
-                </p>
-                {!user && (
-                  <Link
-                    href="/"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                  >
-                    <Home className="h-5 w-5 text-accent" />
-                    <span className="font-medium">Home</span>
-                  </Link>
-                )}
-                <Link
-                  href="/buy"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                >
-                  <ShoppingCart className="h-5 w-5 text-accent" />
-                  <span className="font-medium">Buy Proxies</span>
-                </Link>
-                <Link
-                  href="/buy-emails"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                >
-                  <ShoppingCart className="h-5 w-5 text-accent" />
-                  <span className="font-medium">Buy Emails</span>
-                </Link>
-                <Link
-                  href="/support"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                >
-                  <span className="h-5 w-5 text-accent text-lg">🤝</span>
-                  <span className="font-medium">Support</span>
-                </Link>
-                <Link
-                  href="/docs"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                >
-                  <span className="h-5 w-5 text-accent text-lg">📖</span>
-                  <span className="font-medium">Documentation</span>
-                </Link>
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard" className="flex items-center gap-2 py-1.5 font-medium">
+                        <GoogleIcon name="space_dashboard" size={14} />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard" className="flex items-center gap-2 py-1.5">
+                        <GoogleIcon name="dns" size={14} />
+                        My Proxies
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/orders" className="flex items-center gap-2 py-1.5">
+                        <GoogleIcon name="history" size={14} />
+                        Order History
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/topup" className="flex items-center gap-2 py-1.5">
+                        <GoogleIcon name="account_balance_wallet" size={14} />
+                        Top Up Balance
+                      </Link>
+                    </DropdownMenuItem>
 
-                {user ? (
-                  <>
-                    <div className="my-3 border-t border-border" />
-                    <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Account
-                    </p>
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setOpen(false)}
-                      className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                    >
-                      <LayoutDashboard className="h-5 w-5 text-accent" />
-                      <span className="font-medium">Dashboard</span>
-                    </Link>
-                    <Link
-                      href="/dashboard/orders"
-                      onClick={() => setOpen(false)}
-                      className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                    >
-                      <History className="h-5 w-5 text-accent" />
-                      <span className="font-medium">Order History</span>
-                    </Link>
-                    <Link
-                      href="/topup"
-                      onClick={() => setOpen(false)}
-                      className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                    >
-                      <Wallet className="h-5 w-5 text-accent" />
-                      <span className="font-medium">Top Up Balance</span>
-                    </Link>
-
-                    {user.role === "admin" && (
+                    {(user.role === "admin" || user.role === "superadmin") && (
                       <>
-                        <div className="my-3 border-t border-border" />
-                        <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                          Admin
-                        </p>
-                        <Link
-                          href="/admin"
-                          onClick={() => setOpen(false)}
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                        >
-                          <Shield className="h-5 w-5 text-accent" />
-                          <span className="font-medium">Admin Panel</span>
-                        </Link>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin" className="flex items-center gap-2 py-1.5 text-blue-500 dark:text-blue-400 font-medium">
+                            <GoogleIcon name="shield" size={14} />
+                            Admin Panel
+                          </Link>
+                        </DropdownMenuItem>
                       </>
                     )}
+
                     {user.role === "superadmin" && (
                       <>
-                        <div className="my-3 border-t border-border" />
-                        <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                          SuperAdmin
-                        </p>
-                        <Link
-                          href="/admin"
-                          onClick={() => setOpen(false)}
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                        >
-                          <Shield className="h-5 w-5 text-accent" />
-                          <span className="font-medium">Admin Panel</span>
-                        </Link>
-                        <Link
-                          href="/admin/settings"
-                          onClick={() => setOpen(false)}
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                        >
-                          <span className="h-5 w-5 flex items-center justify-center">⚙️</span>
-                          <span className="font-medium">Settings</span>
-                        </Link>
-                        <Link
-                          href="/admin/upgrade"
-                          onClick={() => setOpen(false)}
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-accent/10"
-                        >
-                          <span className="h-5 w-5 flex items-center justify-center">⚡</span>
-                          <span className="font-medium">Upgrade</span>
-                        </Link>
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin/settings" className="flex items-center gap-2 py-1.5">
+                            <GoogleIcon name="settings" size={14} />
+                            Settings
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin/upgrade" className="flex items-center gap-2 py-1.5">
+                            <GoogleIcon name="bolt" size={14} />
+                            Upgrade
+                          </Link>
+                        </DropdownMenuItem>
                       </>
                     )}
 
-                    <div className="mt-4 px-2">
-                      <Button
-                        onClick={() => {
-                          handleLogout()
-                          setOpen(false)
-                        }}
-                        variant="outline"
-                        className="w-full justify-start gap-2"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Logout
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="mt-6 flex flex-col gap-3 px-2">
-                    <Button asChild className="w-full">
-                      <Link href="/login" onClick={() => setOpen(false)}>
-                        Login
-                      </Link>
-                    </Button>
-                    <Button variant="outline" asChild className="w-full bg-transparent">
-                      <Link href="/register" onClick={() => setOpen(false)}>
-                        Sign Up
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-              </nav>
-
-              <div className="absolute inset-x-0 bottom-0 border-t border-border bg-accent/5 px-6 py-4">
-                <p className="text-center text-xs text-muted-foreground">Premium Proxies, Instant Access</p>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 py-1.5 text-red-500">
+                      <GoogleIcon name="logout" size={14} />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <NotificationPopover />
+                <Button variant="ghost" size="sm" asChild className="h-8 text-xs">
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button size="sm" asChild className="h-8 text-xs bg-emerald-500 hover:bg-emerald-600 text-black font-semibold">
+                  <Link href="/register">Sign Up</Link>
+                </Button>
               </div>
-            </SheetContent>
-          </Sheet>
+            )}
+          </nav>
+
+          {/* Smartphone / Mobile Header Actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
+            {user && (
+              <Link
+                href="/topup"
+                className="flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-500 dark:text-emerald-400 shrink-0"
+              >
+                <GoogleIcon name="account_balance_wallet" size={12} />
+                <span className="text-[11px] sm:text-xs">KES {balance.toFixed(0)}</span>
+              </Link>
+            )}
+
+            <ThemeToggle />
+
+            <NotificationPopover />
+
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <button
+                  className="h-8 w-8 rounded-full border border-border/60 bg-secondary/50 hover:bg-secondary text-foreground transition-all duration-200 flex items-center justify-center shrink-0 outline-none hover:ring-2 hover:ring-blue-500/20"
+                  aria-label="Open navigation menu"
+                  title="Menu"
+                >
+                  <GoogleIcon name="menu" size={18} className="text-muted-foreground hover:text-foreground" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" showClose={false} className="w-[280px] p-0 gap-0 flex flex-col h-full bg-background border-l border-border">
+                {/* Header with single close button */}
+                <div className="flex items-center justify-between border-b border-border bg-secondary/40 px-4 py-3 shrink-0">
+                  <div className="flex items-center">
+                    <img
+                      src="/logo-horizontal-dark.png"
+                      alt="RayProxy"
+                      className="h-8 sm:h-9 w-auto object-contain hidden dark:block"
+                    />
+                    <img
+                      src="/logo-horizontal-light.png"
+                      alt="RayProxy"
+                      className="h-8 sm:h-9 w-auto object-contain block dark:hidden"
+                    />
+                    <SheetTitle className="sr-only">RayProxy</SheetTitle>
+                  </div>
+                  <SheetClose asChild>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
+                      <GoogleIcon name="close" size={16} />
+                    </Button>
+                  </SheetClose>
+                </div>
+
+                {/* Scrollable Menu Body */}
+                <div className="flex-1 overflow-y-auto overscroll-contain">
+                  {user && (
+                    <div className="border-b border-border bg-emerald-500/[0.04] px-4 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white font-bold text-xs">
+                          {userInitial}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-xs text-foreground truncate">{user.name}</p>
+                          <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+                        </div>
+                      </div>
+                      <Link
+                        href="/topup"
+                        onClick={() => setOpen(false)}
+                        className="mt-2.5 flex items-center justify-between rounded-md bg-secondary/60 border border-border/60 px-2.5 py-1.5 transition-colors hover:border-emerald-500/30"
+                      >
+                        <span className="text-xs text-muted-foreground">Balance</span>
+                        <span className="font-semibold text-xs text-emerald-500 dark:text-emerald-400">
+                          KES {balance.toLocaleString()}
+                        </span>
+                      </Link>
+                    </div>
+                  )}
+
+                  <nav className="flex flex-col p-3 text-xs pb-6">
+                    <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      Navigation
+                    </p>
+                    {!user ? (
+                      <Link
+                        href="/"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                      >
+                        <GoogleIcon name="home" size={16} className="text-emerald-500" />
+                        <span>Home</span>
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60 font-medium"
+                      >
+                        <GoogleIcon name="space_dashboard" size={16} className="text-emerald-500" />
+                        <span>Dashboard</span>
+                      </Link>
+                    )}
+                    <Link
+                      href="/buy"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                    >
+                      <GoogleIcon name="shopping_cart" size={16} className="text-emerald-500" />
+                      <span>Buy Proxies</span>
+                    </Link>
+                    <Link
+                      href="/buy-emails"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                    >
+                      <GoogleIcon name="mail" size={16} className="text-emerald-500" />
+                      <span>Buy Emails</span>
+                    </Link>
+                    <Link
+                      href="/support"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                    >
+                      <GoogleIcon name="support_agent" size={16} className="text-emerald-500" />
+                      <span>Support</span>
+                    </Link>
+                    <Link
+                      href="/docs"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                    >
+                      <GoogleIcon name="description" size={16} className="text-emerald-500" />
+                      <span>Documentation</span>
+                    </Link>
+
+                    {user ? (
+                      <>
+                        <div className="my-2 border-t border-border" />
+                        <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          Account
+                        </p>
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60 font-medium"
+                        >
+                          <GoogleIcon name="space_dashboard" size={16} className="text-emerald-500" />
+                          <span>Dashboard</span>
+                        </Link>
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                        >
+                          <GoogleIcon name="dns" size={16} className="text-emerald-500" />
+                          <span>My Proxies</span>
+                        </Link>
+                        <Link
+                          href="/dashboard/orders"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                        >
+                          <GoogleIcon name="history" size={16} className="text-emerald-500" />
+                          <span>Order History</span>
+                        </Link>
+                        <Link
+                          href="/topup"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                        >
+                          <GoogleIcon name="account_balance_wallet" size={16} className="text-emerald-500" />
+                          <span>Top Up Balance</span>
+                        </Link>
+
+                        {(user.role === "admin" || user.role === "superadmin") && (
+                          <>
+                            <div className="my-2 border-t border-border" />
+                            <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                              Admin
+                            </p>
+                            <Link
+                              href="/admin"
+                              onClick={() => setOpen(false)}
+                              className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-blue-500 dark:text-blue-400 font-medium transition-colors hover:bg-secondary/60"
+                            >
+                              <GoogleIcon name="shield" size={16} className="text-blue-500" />
+                              <span>Admin Dashboard</span>
+                            </Link>
+                          </>
+                        )}
+
+                        {user.role === "superadmin" && (
+                          <>
+                            <Link
+                              href="/admin/settings"
+                              onClick={() => setOpen(false)}
+                              className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                            >
+                              <GoogleIcon name="settings" size={16} className="text-emerald-500" />
+                              <span>Settings</span>
+                            </Link>
+                            <Link
+                              href="/admin/upgrade"
+                              onClick={() => setOpen(false)}
+                              className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-foreground transition-colors hover:bg-secondary/60"
+                            >
+                              <GoogleIcon name="bolt" size={16} className="text-emerald-500" />
+                              <span>Upgrade</span>
+                            </Link>
+                          </>
+                        )}
+
+                        <div className="mt-3 px-2">
+                          <Button
+                            onClick={() => {
+                              handleLogout()
+                              setOpen(false)
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="w-full justify-start gap-2 h-8 text-xs text-red-500 hover:text-red-400"
+                          >
+                            <GoogleIcon name="logout" size={14} />
+                            Logout
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="mt-4 flex flex-col gap-2 px-2">
+                        <Button asChild size="sm" className="w-full h-8 text-xs bg-emerald-500 hover:bg-emerald-600 text-black font-semibold">
+                          <Link href="/login" onClick={() => setOpen(false)}>
+                            Login
+                          </Link>
+                        </Button>
+                        <Button variant="outline" size="sm" asChild className="w-full h-8 text-xs bg-transparent">
+                          <Link href="/register" onClick={() => setOpen(false)}>
+                            Sign Up
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
     </div>
   )
 }

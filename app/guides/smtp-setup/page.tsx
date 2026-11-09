@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Copy, Check } from 'lucide-react'
+import { GoogleIcon } from '@/components/ui/google-icon'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function SMTPSetupGuide() {
@@ -98,45 +98,38 @@ export async function POST(request: Request) {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="border-b border-border">
-        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold">SMTP Setup Guide</h1>
-          <p className="mt-2 text-muted-foreground">Configure email sending for your application</p>
+      <div className="border-b border-border bg-secondary/30">
+        <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">SMTP Setup Guide</h1>
+          <p className="mt-0.5 text-xs text-muted-foreground">Configure email sending for your application</p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-4xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl space-y-4 px-4 py-5 sm:px-6">
         {/* Environment Variables */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Environment Variables</CardTitle>
-            <CardDescription>Required configuration for SMTP email sending</CardDescription>
+        <Card className="bg-card border-border shadow-xs rounded-xl">
+          <CardHeader className="p-3.5 border-b border-border/60">
+            <CardTitle className="text-xs font-semibold text-foreground">Environment Variables</CardTitle>
+            <CardDescription className="text-[11px] text-muted-foreground">Required configuration for SMTP email sending</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative rounded-md bg-muted p-4 font-mono text-sm">
+          <CardContent className="p-3.5 space-y-3">
+            <div className="relative rounded-lg bg-secondary/60 dark:bg-zinc-900/60 border border-border/60 p-3 font-mono text-[11px]">
               <pre className="overflow-x-auto whitespace-pre-wrap break-words">{envVariables}</pre>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => copyToClipboard(envVariables, 'env')}
-                className="absolute right-2 top-2"
+                className="absolute right-2 top-2 h-7 w-7 p-0"
               >
                 {copiedCode === 'env' ? (
-                  <Check className="h-4 w-4 text-green-500" />
+                  <GoogleIcon name="check" size={14} className="text-emerald-500 dark:text-emerald-400" />
                 ) : (
-                  <Copy className="h-4 w-4" />
+                  <GoogleIcon name="content_copy" size={14} />
                 )}
               </Button>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <p className="font-semibold text-sm">Variable</p>
-              </div>
-              <div>
-                <p className="font-semibold text-sm">Description</p>
-              </div>
-
+            <div className="grid gap-2 sm:grid-cols-2 text-xs">
               {[
                 { name: 'SMTP_HOST', desc: 'SMTP server address (e.g., smtp.gmail.com)' },
                 { name: 'SMTP_PORT', desc: 'SMTP port (587 for TLS, 465 for SSL)' },
@@ -145,9 +138,9 @@ export async function POST(request: Request) {
                 { name: 'SMTP_FROM', desc: 'Default sender email address' },
                 { name: 'SMTP_FROM_NAME', desc: 'Sender display name' },
               ].map((item) => (
-                <div key={item.name} className="col-span-2 grid gap-4 sm:grid-cols-2 border-t border-border pt-4 first:border-0 first:pt-0">
-                  <p className="font-mono text-sm">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                <div key={item.name} className="col-span-2 grid gap-2 sm:grid-cols-2 border-t border-border/40 pt-2 first:border-0 first:pt-0">
+                  <p className="font-mono text-[11px] text-foreground font-semibold">{item.name}</p>
+                  <p className="text-[11px] text-muted-foreground">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -155,38 +148,38 @@ export async function POST(request: Request) {
         </Card>
 
         {/* Gmail Setup */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Gmail Setup</CardTitle>
-            <CardDescription>Step-by-step guide for Gmail SMTP</CardDescription>
+        <Card className="bg-card border-border shadow-xs rounded-xl">
+          <CardHeader className="p-3.5 border-b border-border/60">
+            <CardTitle className="text-xs font-semibold text-foreground">Gmail Setup</CardTitle>
+            <CardDescription className="text-[11px] text-muted-foreground">Step-by-step guide for Gmail SMTP</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-3.5 space-y-3">
             {gmailSteps.map((step, index) => (
-              <div key={index} className="flex gap-4">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-accent text-white text-sm font-semibold">
+              <div key={index} className="flex gap-2.5 items-start">
+                <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent text-background text-[10px] font-bold mt-0.5">
                   {index + 1}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold">{step.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{step.description}</p>
+                  <h3 className="text-xs font-semibold text-foreground">{step.title}</h3>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{step.description}</p>
                   {step.link && (
                     <a
                       href={step.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center text-sm text-accent hover:underline"
+                      className="mt-1 inline-flex items-center text-[11px] text-accent hover:underline"
                     >
                       Open {step.link.split('/')[2]}
-                      <span className="ml-1">→</span>
+                      <GoogleIcon name="arrow_forward" size={11} className="ml-0.5" />
                     </a>
                   )}
                 </div>
               </div>
             ))}
 
-            <div className="mt-6 rounded-md bg-accent/10 p-4 text-sm">
-              <p className="font-semibold text-accent">Pro Tip</p>
-              <p className="mt-1 text-muted-foreground">
+            <div className="mt-3 rounded-lg bg-accent/10 border border-accent/20 p-2.5 text-xs">
+              <p className="font-semibold text-accent text-[11px]">Pro Tip</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
                 Use Gmail's App Passwords instead of your regular password for better security. Never commit environment variables to version control.
               </p>
             </div>
@@ -194,55 +187,55 @@ export async function POST(request: Request) {
         </Card>
 
         {/* Code Examples */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Code Examples</CardTitle>
-            <CardDescription>How to use SMTP in your application</CardDescription>
+        <Card className="bg-card border-border shadow-xs rounded-xl">
+          <CardHeader className="p-3.5 border-b border-border/60">
+            <CardTitle className="text-xs font-semibold text-foreground">Code Examples</CardTitle>
+            <CardDescription className="text-[11px] text-muted-foreground">How to use SMTP in your application</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3.5">
             <Tabs defaultValue="nodejs" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="nodejs">Node.js Example</TabsTrigger>
-                <TabsTrigger value="vercel">Next.js / Vercel</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 h-8 p-0.5 bg-secondary border border-border rounded-lg">
+                <TabsTrigger value="nodejs" className="text-xs h-7">Node.js Example</TabsTrigger>
+                <TabsTrigger value="vercel" className="text-xs h-7">Next.js / Vercel</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="nodejs" className="space-y-4">
-                <p className="text-sm text-muted-foreground">Basic Node.js nodemailer example</p>
-                <div className="relative rounded-md bg-muted p-4">
-                  <pre className="overflow-x-auto text-xs font-mono whitespace-pre-wrap break-words">
+              <TabsContent value="nodejs" className="space-y-2 mt-2">
+                <p className="text-[11px] text-muted-foreground">Basic Node.js nodemailer example</p>
+                <div className="relative rounded-lg bg-secondary/60 dark:bg-zinc-900/60 border border-border/60 p-3">
+                  <pre className="overflow-x-auto text-[11px] font-mono whitespace-pre-wrap break-words">
                     {nodejsExample}
                   </pre>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(nodejsExample, 'nodejs')}
-                    className="absolute right-2 top-2"
+                    className="absolute right-2 top-2 h-7 w-7 p-0"
                   >
                     {copiedCode === 'nodejs' ? (
-                      <Check className="h-4 w-4 text-green-500" />
+                      <GoogleIcon name="check" size={14} className="text-emerald-500 dark:text-emerald-400" />
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <GoogleIcon name="content_copy" size={14} />
                     )}
                   </Button>
                 </div>
               </TabsContent>
 
-              <TabsContent value="vercel" className="space-y-4">
-                <p className="text-sm text-muted-foreground">Next.js API Route for email sending</p>
-                <div className="relative rounded-md bg-muted p-4">
-                  <pre className="overflow-x-auto text-xs font-mono whitespace-pre-wrap break-words">
+              <TabsContent value="vercel" className="space-y-2 mt-2">
+                <p className="text-[11px] text-muted-foreground">Next.js API Route for email sending</p>
+                <div className="relative rounded-lg bg-secondary/60 dark:bg-zinc-900/60 border border-border/60 p-3">
+                  <pre className="overflow-x-auto text-[11px] font-mono whitespace-pre-wrap break-words">
                     {vercelExample}
                   </pre>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(vercelExample, 'vercel')}
-                    className="absolute right-2 top-2"
+                    className="absolute right-2 top-2 h-7 w-7 p-0"
                   >
                     {copiedCode === 'vercel' ? (
-                      <Check className="h-4 w-4 text-green-500" />
+                      <GoogleIcon name="check" size={14} className="text-emerald-500 dark:text-emerald-400" />
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <GoogleIcon name="content_copy" size={14} />
                     )}
                   </Button>
                 </div>
@@ -252,112 +245,68 @@ export async function POST(request: Request) {
         </Card>
 
         {/* Other Providers */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Other Email Providers</CardTitle>
-            <CardDescription>SMTP settings for popular email services</CardDescription>
+        <Card className="bg-card border-border shadow-xs rounded-xl">
+          <CardHeader className="p-3.5 border-b border-border/60">
+            <CardTitle className="text-xs font-semibold text-foreground">Other Email Providers</CardTitle>
+            <CardDescription className="text-[11px] text-muted-foreground">SMTP settings for popular email services</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {[
-              {
-                name: 'SendGrid',
-                host: 'smtp.sendgrid.net',
-                port: '587',
-                user: 'apikey',
-                notes: 'Password is your SendGrid API key',
-              },
-              {
-                name: 'AWS SES',
-                host: 'email-smtp.[region].amazonaws.com',
-                port: '587',
-                user: 'Your SMTP username from AWS Console',
-                notes: 'Requires SMTP credentials from AWS SES',
-              },
-              {
-                name: 'Mailgun',
-                host: 'smtp.mailgun.org',
-                port: '587',
-                user: 'postmaster@[your domain]',
-                notes: 'Find your domain in Mailgun dashboard',
-              },
-              {
-                name: 'Brevo (Sendinblue)',
-                host: 'smtp-relay.brevo.com',
-                port: '587',
-                user: 'Your Brevo email',
-                notes: 'Get SMTP password from account settings',
-              },
-            ].map((provider) => (
-              <div key={provider.name} className="rounded-lg border border-border p-4">
-                <h3 className="font-semibold">{provider.name}</h3>
-                <div className="mt-3 grid gap-2 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Host</p>
-                    <p className="font-mono">{provider.host}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Port</p>
-                    <p className="font-mono">{provider.port}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Username</p>
-                    <p className="font-mono text-xs">{provider.user}</p>
-                  </div>
-                  {provider.notes && (
-                    <div className="rounded bg-muted/50 p-2 text-xs">
-                      <p className="text-muted-foreground">{provider.notes}</p>
+          <CardContent className="p-3.5">
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              {[
+                { name: 'SendGrid', host: 'smtp.sendgrid.net', port: '587', user: 'apikey', notes: 'Password is your SendGrid API key' },
+                { name: 'AWS SES', host: 'email-smtp.[region].amazonaws.com', port: '587', user: 'Your SMTP username', notes: 'Requires SMTP credentials from AWS SES' },
+                { name: 'Mailgun', host: 'smtp.mailgun.org', port: '587', user: 'postmaster@[your domain]', notes: 'Find in Mailgun dashboard' },
+                { name: 'Brevo', host: 'smtp-relay.brevo.com', port: '587', user: 'Your Brevo email', notes: 'Get SMTP password from account settings' },
+              ].map((provider) => (
+                <div key={provider.name} className="rounded-lg border border-border bg-secondary/40 p-2.5">
+                  <h3 className="text-xs font-semibold text-foreground">{provider.name}</h3>
+                  <div className="mt-1.5 space-y-0.5 text-[11px]">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Host:</span>
+                      <span className="font-mono">{provider.host}</span>
                     </div>
-                  )}
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Port:</span>
+                      <span className="font-mono">{provider.port}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </CardContent>
         </Card>
 
         {/* Troubleshooting */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Troubleshooting</CardTitle>
-            <CardDescription>Common issues and solutions</CardDescription>
+        <Card className="bg-card border-border shadow-xs rounded-xl">
+          <CardHeader className="p-3.5 border-b border-border/60">
+            <CardTitle className="text-xs font-semibold text-foreground">Troubleshooting</CardTitle>
+            <CardDescription className="text-[11px] text-muted-foreground">Common issues and solutions</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-3.5 space-y-2">
             {[
-              {
-                issue: 'Authentication Failed',
-                solution: 'Verify your SMTP_USER and SMTP_PASSWORD are correct. For Gmail, ensure you\'re using an App Password, not your regular password.',
-              },
-              {
-                issue: 'Connection Timeout',
-                solution: 'Check that SMTP_HOST and SMTP_PORT are correct. Port 587 (TLS) is recommended over 465 (SSL).',
-              },
-              {
-                issue: 'Environment Variables Not Loading',
-                solution: 'Make sure variables are set in Vercel project settings or your .env.local file. Restart your development server after adding them.',
-              },
-              {
-                issue: 'Emails Going to Spam',
-                solution: 'Set up SPF, DKIM, and DMARC records for your domain. Use a proper sender name and avoid spam trigger words.',
-              },
+              { issue: 'Authentication Failed', solution: 'Verify SMTP credentials. For Gmail, use an App Password, not regular password.' },
+              { issue: 'Connection Timeout', solution: 'Check that SMTP_HOST and SMTP_PORT are correct. Port 587 (TLS) is recommended.' },
+              { issue: 'Environment Variables Not Loading', solution: 'Ensure variables are in .env.local or Vercel settings and restart server.' },
+              { issue: 'Emails Going to Spam', solution: 'Set up SPF, DKIM, and DMARC records and avoid spam trigger words.' },
             ].map((item, index) => (
-              <div key={index} className="rounded-lg border border-border p-4">
-                <h3 className="font-semibold text-destructive">{item.issue}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{item.solution}</p>
+              <div key={index} className="rounded-lg border border-border bg-secondary/40 p-2.5">
+                <h3 className="text-xs font-semibold text-rose-500 dark:text-rose-400">{item.issue}</h3>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">{item.solution}</p>
               </div>
             ))}
           </CardContent>
         </Card>
 
         {/* Tips */}
-        <Card className="border-accent/50 bg-accent/5">
-          <CardHeader>
-            <CardTitle className="text-accent">Security Tips</CardTitle>
+        <Card className="border-accent/30 bg-accent/5 rounded-xl">
+          <CardHeader className="p-3.5">
+            <CardTitle className="text-xs font-semibold text-accent">Security Tips</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <p>Never commit environment variables to git or public repositories</p>
-            <p>Use environment-specific passwords or API keys</p>
-            <p>Rotate your SMTP password regularly</p>
-            <p>Use TLS (port 587) instead of SSL for better compatibility</p>
-            <p>Monitor failed email sends for suspicious activity</p>
+          <CardContent className="p-3.5 pt-0 space-y-1 text-[11px] text-muted-foreground">
+            <p>• Never commit environment variables to git or public repositories</p>
+            <p>• Use environment-specific passwords or API keys</p>
+            <p>• Rotate your SMTP password regularly</p>
+            <p>• Use TLS (port 587) instead of SSL for better compatibility</p>
           </CardContent>
         </Card>
       </div>

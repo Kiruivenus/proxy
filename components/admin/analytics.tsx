@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts"
-import { DollarSign, ShoppingCart, TrendingUp, Loader2, Globe } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 interface AnalyticsData {
     summary: {
@@ -49,21 +49,21 @@ export function Analytics() {
 
     if (loading) {
         return (
-            <div className="flex h-[400px] items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+            <div className="flex h-[320px] items-center justify-center">
+                <GoogleIcon name="progress_activity" size={24} className="animate-spin text-accent" />
             </div>
         )
     }
 
     if (error) {
         return (
-            <div className="flex h-[400px] flex-col items-center justify-center gap-4 text-center">
-                <div className="rounded-full bg-destructive/10 p-4">
-                    <Globe className="h-12 w-12 text-destructive" />
+            <div className="flex h-[320px] flex-col items-center justify-center gap-3 text-center">
+                <div className="rounded-full bg-destructive/10 p-3">
+                    <GoogleIcon name="public" size={32} className="text-destructive" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-bold text-destructive">Error Loading Analytics</h2>
-                    <p className="text-muted-foreground mt-2">{error}</p>
+                    <h2 className="text-lg font-bold text-destructive">Error Loading Analytics</h2>
+                    <p className="text-xs text-muted-foreground mt-1">{error}</p>
                 </div>
             </div>
         )
@@ -72,47 +72,47 @@ export function Analytics() {
     if (!data) return null
 
     return (
-        <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Proxies Sold Today</CardTitle>
-                        <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+        <div className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-3">
+                <Card className="rounded-xl border border-border bg-card text-card-foreground shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 p-3.5">
+                        <CardTitle className="text-xs font-medium text-muted-foreground">Proxies Sold Today</CardTitle>
+                        <GoogleIcon name="shopping_cart" size={16} className="text-muted-foreground" />
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{data.summary.proxiesSoldToday}</div>
-                        <p className="text-xs text-muted-foreground">Orders completed today</p>
+                    <CardContent className="p-3.5 pt-0">
+                        <div className="text-xl font-bold text-foreground">{data.summary.proxiesSoldToday}</div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">Orders completed today</p>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Profit Today</CardTitle>
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <Card className="rounded-xl border border-border bg-card text-card-foreground shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 p-3.5">
+                        <CardTitle className="text-xs font-medium text-muted-foreground">Profit Today</CardTitle>
+                        <GoogleIcon name="payments" size={16} className="text-muted-foreground" />
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">KES {data.summary.revenueToday.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground">Combined proxy & email revenue</p>
+                    <CardContent className="p-3.5 pt-0">
+                        <div className="text-xl font-bold text-foreground">KES {data.summary.revenueToday.toLocaleString()}</div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">Combined proxy & email revenue</p>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Lifetime Profit</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <Card className="rounded-xl border border-border bg-card text-card-foreground shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 p-3.5">
+                        <CardTitle className="text-xs font-medium text-muted-foreground">Total Lifetime Profit</CardTitle>
+                        <GoogleIcon name="trending_up" size={16} className="text-muted-foreground" />
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">KES {data.summary.totalRevenue.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground">Total platform revenue</p>
+                    <CardContent className="p-3.5 pt-0">
+                        <div className="text-xl font-bold text-foreground">KES {data.summary.totalRevenue.toLocaleString()}</div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">Total platform revenue</p>
                     </CardContent>
                 </Card>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Sales Trend</CardTitle>
-                        <CardDescription>Daily proxies and email sales (Last 7 Days)</CardDescription>
+            <div className="grid gap-4 md:grid-cols-2">
+                <Card className="rounded-xl border border-border bg-card text-card-foreground shadow-sm">
+                    <CardHeader className="p-4 pb-2">
+                        <CardTitle className="text-xs font-semibold text-foreground">Sales Trend</CardTitle>
+                        <CardDescription className="text-[11px] text-muted-foreground">Daily proxies and email sales (Last 7 Days)</CardDescription>
                     </CardHeader>
-                    <CardContent className="h-[300px]">
+                    <CardContent className="h-[260px] p-4 pt-0">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={data.chartData}>
                                 <defs>
@@ -121,11 +121,11 @@ export function Analytics() {
                                         <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" />
-                                <XAxis dataKey="name" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="opacity-15" />
+                                <XAxis dataKey="name" stroke="currentColor" className="opacity-60" fontSize={10} tickLine={false} axisLine={false} />
+                                <YAxis stroke="currentColor" className="opacity-60" fontSize={10} tickLine={false} axisLine={false} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid #333", borderRadius: "8px" }}
+                                    contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "8px", fontSize: "11px", color: "var(--foreground)" }}
                                     itemStyle={{ color: "#3b82f6" }}
                                 />
                                 <Area type="monotone" dataKey="proxies" stroke="#3b82f6" fillOpacity={1} fill="url(#colorProxies)" />
@@ -135,19 +135,19 @@ export function Analytics() {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Top Selling Areas</CardTitle>
-                        <CardDescription>Proxy demand by country</CardDescription>
+                <Card className="rounded-xl border border-border bg-card text-card-foreground shadow-sm">
+                    <CardHeader className="p-4 pb-2">
+                        <CardTitle className="text-xs font-semibold text-foreground">Top Selling Areas</CardTitle>
+                        <CardDescription className="text-[11px] text-muted-foreground">Proxy demand by country</CardDescription>
                     </CardHeader>
-                    <CardContent className="h-[300px]">
+                    <CardContent className="h-[260px] p-4 pt-0">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data.topCountries} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#333" />
+                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="currentColor" className="opacity-15" />
                                 <XAxis type="number" hide />
-                                <YAxis dataKey="name" type="category" stroke="#666" fontSize={12} tickLine={false} axisLine={false} width={80} />
+                                <YAxis dataKey="name" type="category" stroke="currentColor" className="opacity-60" fontSize={10} tickLine={false} axisLine={false} width={80} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid #333", borderRadius: "8px" }}
+                                    contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "8px", fontSize: "11px", color: "var(--foreground)" }}
                                 />
                                 <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]} />
                             </BarChart>

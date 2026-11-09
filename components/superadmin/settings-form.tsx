@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, RefreshCw, Calendar, Clock, AlertTriangle } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 import { toast } from "sonner"
 
 interface WebsiteSettings {
@@ -83,8 +83,8 @@ export function SettingsForm() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-accent" />
+      <div className="flex justify-center py-8">
+        <GoogleIcon name="progress_activity" size={22} className="animate-spin text-accent" />
       </div>
     )
   }
@@ -92,94 +92,92 @@ export function SettingsForm() {
   if (!settings) return null
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      <Card className="bg-zinc-950/40 border-border/40 backdrop-blur-md">
-        <CardHeader>
+    <div className="space-y-4 max-w-2xl mx-auto">
+      <Card className="bg-card border-border shadow-xs rounded-xl">
+        <CardHeader className="p-4 border-b border-border/60">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Website Subscription Status</CardTitle>
-              <CardDescription>Monitor your platform's active status</CardDescription>
+              <CardTitle className="text-xs font-semibold text-foreground">Website Subscription Status</CardTitle>
+              <CardDescription className="text-[11px] text-muted-foreground mt-0.5">Monitor your platform's active status</CardDescription>
             </div>
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={fetchSettings} disabled={loading} className="h-8 w-8 text-muted-foreground hover:text-white">
-                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" onClick={fetchSettings} disabled={loading} className="h-7 w-7 text-muted-foreground hover:text-foreground">
+                <GoogleIcon name="refresh" size={15} className={loading ? "animate-spin" : ""} />
               </Button>
-              <Badge variant={settings.subscriptionActive ? "default" : "destructive"} className={settings.subscriptionActive ? "bg-green-500/20 text-green-500 hover:bg-green-500/30" : ""}>
+              <Badge variant={settings.subscriptionActive ? "default" : "destructive"} className={settings.subscriptionActive ? "bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border-emerald-500/20 text-[10px] py-0 px-2 h-5" : "text-[10px] py-0 px-2 h-5"}>
                 {settings.subscriptionActive ? "Active" : "Inactive"}
               </Badge>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-xl border border-border/40 bg-zinc-900/50 p-4 space-y-2">
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Calendar className="h-4 w-4" />
+        <CardContent className="p-4 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="rounded-lg border border-border bg-secondary/40 p-3 space-y-1">
+              <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                <GoogleIcon name="calendar_today" size={14} />
                 <span>Expires At</span>
               </div>
-              <p className="text-lg font-bold">
+              <p className="text-xs font-mono font-bold text-foreground">
                 {new Date(settings.subscriptionExpiresAt).toLocaleString()}
               </p>
             </div>
-            <div className="rounded-xl border border-border/40 bg-zinc-900/50 p-4 space-y-2">
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Clock className="h-4 w-4" />
+            <div className="rounded-lg border border-border bg-secondary/40 p-3 space-y-1">
+              <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                <GoogleIcon name="schedule" size={14} />
                 <span>Time Remaining</span>
               </div>
-              <p className={`text-lg font-bold ${!settings.subscriptionActive ? "text-destructive" : "text-accent"}`}>
+              <p className={`text-xs font-mono font-bold ${!settings.subscriptionActive ? "text-destructive" : "text-accent"}`}>
                 {getTimeRemaining(settings.subscriptionExpiresAt)}
               </p>
             </div>
           </div>
 
           {!settings.subscriptionActive && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive">
-              <AlertTriangle className="h-5 w-5 flex-shrink-0" />
-              <p className="text-sm">Your website subscription has expired. Please upgrade to restore full functionality.</p>
+            <div className="flex items-center gap-2.5 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs">
+              <GoogleIcon name="warning" size={16} className="shrink-0" />
+              <p>Your website subscription has expired. Please upgrade to restore full functionality.</p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      <Card className="bg-zinc-950/40 border-border/40 backdrop-blur-md">
-        <CardHeader>
-          <CardTitle>Subscription Configuration</CardTitle>
-          <CardDescription>Set the duration for your next subscription renewal</CardDescription>
+      <Card className="bg-card border-border shadow-xs rounded-xl">
+        <CardHeader className="p-4 border-b border-border/60">
+          <CardTitle className="text-xs font-semibold text-foreground">Subscription Configuration</CardTitle>
+          <CardDescription className="text-[11px] text-muted-foreground mt-0.5">Set the duration for your next subscription renewal</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="duration">Renewal Duration</Label>
+        <CardContent className="p-4 space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="duration" className="text-xs font-medium">Renewal Duration</Label>
             <Select value={duration} onValueChange={setDuration}>
-              <SelectTrigger id="duration" className="h-11 bg-zinc-950/40 border-border/50">
+              <SelectTrigger id="duration" className="h-9 text-xs bg-background border-border text-foreground">
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1min">1 Minute (Testing)</SelectItem>
-                <SelectItem value="1day">1 Day</SelectItem>
-                <SelectItem value="1week">1 Week</SelectItem>
-                <SelectItem value="2weeks">2 Weeks</SelectItem>
-                <SelectItem value="1month">1 Month</SelectItem>
+                <SelectItem value="1min" className="text-xs">1 Minute (Testing)</SelectItem>
+                <SelectItem value="1day" className="text-xs">1 Day</SelectItem>
+                <SelectItem value="1week" className="text-xs">1 Week</SelectItem>
+                <SelectItem value="2weeks" className="text-xs">2 Weeks</SelectItem>
+                <SelectItem value="1month" className="text-xs">1 Month</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[11px] text-muted-foreground">
               This duration will be applied when you make a payment on the Upgrade page.
             </p>
           </div>
         </CardContent>
-        <CardFooter className="border-t border-border/10 pt-6 flex flex-col items-stretch gap-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-muted-foreground italic">
-              {duration !== settings.subscriptionDuration ? "⚠️ You have unsaved changes" : "✅ Current configuration is active"}
-            </p>
-            <Button 
-              className="bg-accent hover:bg-accent/90 text-background font-bold px-8 shadow-lg shadow-accent/20"
-              disabled={saving || duration === settings.subscriptionDuration}
-              onClick={handleSave}
-            >
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Configuration
-            </Button>
-          </div>
+        <CardFooter className="border-t border-border/60 p-4 flex items-center justify-between">
+          <p className="text-[11px] text-muted-foreground italic">
+            {duration !== settings.subscriptionDuration ? "⚠️ You have unsaved changes" : "✅ Current configuration is active"}
+          </p>
+          <Button 
+            className="bg-accent hover:bg-accent/90 text-background font-semibold text-xs h-8 px-4"
+            disabled={saving || duration === settings.subscriptionDuration}
+            onClick={handleSave}
+          >
+            {saving && <GoogleIcon name="progress_activity" size={13} className="mr-1.5 animate-spin" />}
+            Save Configuration
+          </Button>
         </CardFooter>
       </Card>
     </div>

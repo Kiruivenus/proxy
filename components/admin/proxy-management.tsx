@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Loader2, Trash2, AlertCircle, Edit2, ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { AddProxyModal } from "./add-proxy-modal"
@@ -384,7 +384,7 @@ export function ProxyManagement() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="rounded-full bg-destructive/10 p-4 mb-4">
-          <AlertCircle className="h-12 w-12 text-destructive" />
+          <GoogleIcon name="error" size={36} className="text-destructive" />
         </div>
         <h2 className="text-xl font-bold text-destructive">Error Loading Data</h2>
         <p className="text-muted-foreground mt-2">{error}</p>
@@ -397,9 +397,9 @@ export function ProxyManagement() {
   return (
     <div className="space-y-6">
       {noPricingConfigured && (
-        <div className="flex items-center gap-2 rounded-md bg-amber-500/10 p-4 text-amber-600">
-          <AlertCircle className="h-5 w-5" />
-          <p className="text-sm">Please add country pricing first before adding proxies.</p>
+        <div className="flex items-center gap-2 rounded-md bg-amber-500/10 p-3 text-amber-500 text-xs">
+          <GoogleIcon name="warning" size={16} />
+          <p>Please add country pricing first before adding proxies.</p>
         </div>
       )}
 
@@ -424,21 +424,21 @@ export function ProxyManagement() {
       </div>
 
       {/* Filtering Toolbar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+          <GoogleIcon name="search" size={16} className="absolute left-3 top-3 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search IP, country..."
-            className="pl-9 bg-zinc-950/40 border-border/50 h-11"
+            className="pl-9 bg-background border-border text-foreground h-10 text-xs"
           />
         </div>
 
         {/* Status Filter */}
         <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
-          <SelectTrigger className="bg-zinc-950/40 border-border/50 h-11">
+          <SelectTrigger className="bg-background border-border text-foreground h-11">
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent>
@@ -451,7 +451,7 @@ export function ProxyManagement() {
 
         {/* Active/Visibility Filter */}
         <Select value={activeFilter} onValueChange={(v) => { setActiveFilter(v); setPage(1); }}>
-          <SelectTrigger className="bg-zinc-950/40 border-border/50 h-11">
+          <SelectTrigger className="bg-background border-border text-foreground h-11">
             <SelectValue placeholder="All Visibility" />
           </SelectTrigger>
           <SelectContent>
@@ -463,7 +463,7 @@ export function ProxyManagement() {
 
         {/* Page Limit */}
         <Select value={limit.toString()} onValueChange={(v) => { setLimit(Number(v)); setPage(1); }}>
-          <SelectTrigger className="bg-zinc-950/40 border-border/50 h-11">
+          <SelectTrigger className="bg-background border-border text-foreground h-11">
             <SelectValue placeholder="50 rows per page" />
           </SelectTrigger>
           <SelectContent>
@@ -482,7 +482,7 @@ export function ProxyManagement() {
         <CardContent className="p-0 sm:p-6 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-accent" />
+              <GoogleIcon name="progress_activity" size={24} className="animate-spin text-accent" />
             </div>
           ) : proxies.length === 0 ? (
             <p className="text-center text-muted-foreground py-16">No proxies found matching your criteria</p>
@@ -527,7 +527,7 @@ export function ProxyManagement() {
                       </TableCell>
                       <TableCell>
                         <Select value={proxy.status} onValueChange={(v) => handleStatusChange(proxy.id, v as any)}>
-                          <SelectTrigger className="w-32 bg-zinc-950/40 border-border/50">
+                          <SelectTrigger className="w-32 bg-background border-border text-foreground">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -544,11 +544,11 @@ export function ProxyManagement() {
                         />
                       </TableCell>
                       <TableCell className="flex gap-1.5">
-                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(proxy)}>
-                          <Edit2 className="h-4 w-4 text-blue-500" />
+                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(proxy)} className="h-8 w-8">
+                          <GoogleIcon name="edit" size={15} className="text-blue-400" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(proxy.id)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(proxy.id)} className="h-8 w-8">
+                          <GoogleIcon name="delete" size={15} className="text-destructive" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -560,8 +560,8 @@ export function ProxyManagement() {
 
           {/* Pagination Controls */}
           {!loading && totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between border-t border-border/10 pt-4 mt-6 gap-4 px-4 sm:px-0">
-              <div className="text-sm text-muted-foreground text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center justify-between border-t border-border/10 pt-4 mt-6 gap-4 px-4 sm:px-0 text-xs">
+              <div className="text-xs text-muted-foreground text-center sm:text-left">
                 Showing Page <span className="font-semibold text-foreground">{page}</span> of{" "}
                 <span className="font-semibold text-foreground">{totalPages}</span> ({total} total proxies)
               </div>
@@ -571,9 +571,9 @@ export function ProxyManagement() {
                   size="sm"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="bg-zinc-950/40 border-border/50 hover:bg-accent/5"
+                  className="bg-background border-border text-foreground hover:bg-muted h-8 text-xs gap-1"
                 >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  <GoogleIcon name="chevron_left" size={15} />
                   Previous
                 </Button>
                 <Button
@@ -581,10 +581,10 @@ export function ProxyManagement() {
                   size="sm"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="bg-zinc-950/40 border-border/50 hover:bg-accent/5"
+                  className="bg-background border-border text-foreground hover:bg-muted h-8 text-xs gap-1"
                 >
                   Next
-                  <ChevronRight className="h-4 w-4 ml-1" />
+                  <GoogleIcon name="chevron_right" size={15} />
                 </Button>
               </div>
             </div>

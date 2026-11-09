@@ -14,7 +14,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Upload } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 interface PricingItem {
   id: string
@@ -49,8 +49,8 @@ export function BulkUploadModal({ pricing, onUpload, noPricingConfigured }: Bulk
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" disabled={noPricingConfigured}>
-          <Upload className="mr-2 h-4 w-4" />
+        <Button variant="outline" disabled={noPricingConfigured} size="sm" className="h-8 text-xs gap-1.5">
+          <GoogleIcon name="upload" size={15} />
           Bulk Upload
         </Button>
       </DialogTrigger>
@@ -85,8 +85,8 @@ export function BulkUploadModal({ pricing, onUpload, noPricingConfigured }: Bulk
           />
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit} disabled={submitting || !bulkCountry || !bulkData}>
-            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button onClick={handleSubmit} disabled={submitting || !bulkCountry || !bulkData} size="sm" className="h-8 text-xs">
+            {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
             Upload
           </Button>
         </DialogFooter>

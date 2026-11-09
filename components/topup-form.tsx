@@ -1,20 +1,18 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, CheckCircle, Wallet } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 interface TopUpFormProps {
   currentBalance: number
 }
 
-const quickAmounts = [100, 250, 500, 1000]
+const quickAmounts = [100, 250, 500, 1000, 2000, 5000]
 
 export function TopUpForm({ currentBalance }: TopUpFormProps) {
   const router = useRouter()
@@ -26,6 +24,7 @@ export function TopUpForm({ currentBalance }: TopUpFormProps) {
 
   const handleQuickAmount = (value: number) => {
     setAmount(value.toString())
+    setError("")
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,10 +40,10 @@ export function TopUpForm({ currentBalance }: TopUpFormProps) {
       return
     }
 
-    // Validate phone number
+    // Clean and validate phone number
     const cleanPhone = phoneNumber.replace(/\D/g, "")
     if (!cleanPhone.match(/^(254|0)?[17]\d{8}$/)) {
-      setError("Please enter a valid M-Pesa phone number")
+      setError("Please enter a valid Safaricom phone number (e.g. 0712345678)")
       setLoading(false)
       return
     }
@@ -56,7 +55,7 @@ export function TopUpForm({ currentBalance }: TopUpFormProps) {
         : `254${cleanPhone}`
 
     try {
-      // Create top-up
+      // Create top-up record
       const topUpRes = await fetch("/api/topup/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -98,16 +97,19 @@ export function TopUpForm({ currentBalance }: TopUpFormProps) {
         if (attempts >= maxAttempts) {
           clearInterval(pollInterval)
           setPaymentStatus("failed")
-          setError("Payment timeout. If money was deducted, your balance will be updated shortly.")
+          setError("Payment timeout. If money was deducted, your balance will update shortly.")
           setLoading(false)
           return
         }
 
         try {
-          const statusRes = await fetch(`/api/mpesa/query-status?checkoutRequestId=${stkData.checkoutRequestId}&type=topup`, { cache: "no-store" })
+          const statusRes = await fetch(
+            `/api/mpesa/query-status?checkoutRequestId=${stkData.checkoutRequestId}&type=topup`,
+            { cache: "no-store" }
+          )
           const statusData = await statusRes.json()
 
-          if (statusData.status === "completed") {
+          if (statusData.status === "completed" || statusData.status === "paid") {
             clearInterval(pollInterval)
             setPaymentStatus("success")
             setTimeout(() => {
@@ -117,7 +119,7 @@ export function TopUpForm({ currentBalance }: TopUpFormProps) {
           } else if (statusData.status === "failed") {
             clearInterval(pollInterval)
             setPaymentStatus("failed")
-            setError(statusData.error || "Payment failed. Please try again.")
+            setError(statusData.error || "Payment was cancelled or failed. Please try again.")
             setLoading(false)
           }
         } catch {
@@ -125,107 +127,158 @@ export function TopUpForm({ currentBalance }: TopUpFormProps) {
         }
       }, 2000)
     } catch {
-      setError("Something went wrong")
+      setError("An unexpected error occurred. Please try again.")
       setPaymentStatus("failed")
       setLoading(false)
     }
   }
 
   return (
-    <Card className="bg-zinc-950/40 backdrop-blur-md border-border/40 shadow-xl">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Add Funds</CardTitle>
-            <CardDescription>Top up your balance via M-Pesa</CardDescription>
+    <div className="max-w-md mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Balance Badge */}
+        <div className="flex items-center justify-between p-3 rounded-xl border border-border/80 bg-secondary/30">
+          <span className="text-xs text-muted-foreground font-medium">Current Balance</span>
+          <span className="text-sm font-bold text-emerald-500 dark:text-emerald-400 font-mono">
+            KES {currentBalance.toLocaleString()}
+          </span>
+        </div>
+
+        {/* Amount Selection */}
+        <div className="space-y-1.5">
+          <Label htmlFor="topup-amount" className="text-xs font-semibold text-foreground">
+            Deposit Amount (KES)
+          </Label>
+          <div className="relative">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground pointer-events-none">
+              KES
+            </div>
+            <Input
+              id="topup-amount"
+              type="number"
+              placeholder="Enter amount (min. 10)"
+              value={amount}
+              onChange={(e) => {
+                setAmount(e.target.value)
+                setError("")
+              }}
+              min={10}
+              required
+              className="pl-13 h-11 text-sm bg-secondary/40 dark:bg-zinc-900/60 border-border rounded-xl font-medium focus:border-emerald-500"
+            />
           </div>
-          <div className="flex items-center gap-2 rounded-lg bg-accent/10 px-3 py-2">
-            <Wallet className="h-5 w-5 text-accent" />
-            <span className="font-bold">KES {currentBalance.toLocaleString()}</span>
+
+          {/* Quick Amount Presets */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {quickAmounts.map((amt) => {
+              const isSelected = amount === amt.toString()
+              return (
+                <button
+                  key={amt}
+                  type="button"
+                  onClick={() => handleQuickAmount(amt)}
+                  className={`h-8 px-3 rounded-lg border text-xs font-medium transition-all ${
+                    isSelected
+                      ? "bg-emerald-500/15 border-emerald-500/50 text-emerald-500 dark:text-emerald-400 font-semibold shadow-sm"
+                      : "border-border/70 bg-secondary/40 dark:bg-zinc-900/40 text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  }`}
+                >
+                  KES {amt.toLocaleString()}
+                </button>
+              )
+            })}
           </div>
         </div>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-6">
-          {error && <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
 
-          {paymentStatus === "pending" && (
-            <div className="rounded-md bg-accent/10 p-4 text-center">
-              <Loader2 className="mx-auto h-8 w-8 animate-spin text-accent" />
-              <p className="mt-2 font-medium">Check your phone for M-Pesa prompt</p>
-              <p className="text-sm text-muted-foreground">Enter your PIN to complete payment</p>
+        {/* Phone Number Input */}
+        <div className="space-y-1.5">
+          <Label htmlFor="topup-phone" className="text-xs font-semibold text-foreground">
+            M-Pesa Phone Number
+          </Label>
+          <div className="relative">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-muted-foreground font-mono pointer-events-none">
+              <img
+                src="https://flagcdn.com/20x15/ke.png"
+                alt="Kenya"
+                className="h-3 w-4 object-cover rounded-[2px]"
+              />
+              <span>+254</span>
             </div>
-          )}
+            <Input
+              id="topup-phone"
+              type="tel"
+              placeholder="712345678 or 0712345678"
+              value={phoneNumber}
+              onChange={(e) => {
+                setPhoneNumber(e.target.value)
+                setError("")
+              }}
+              required
+              className="pl-20 h-11 text-xs sm:text-sm bg-secondary/40 dark:bg-zinc-900/60 border-border rounded-xl font-mono focus:border-emerald-500"
+            />
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            An instant M-Pesa STK push notification will be sent to this phone number.
+          </p>
+        </div>
 
-          {paymentStatus === "success" && (
-            <div className="rounded-md bg-green-500/10 p-4 text-center">
-              <CheckCircle className="mx-auto h-8 w-8 text-green-500" />
-              <p className="mt-2 font-medium text-green-500">Top-up Successful!</p>
-              <p className="text-sm text-muted-foreground">Redirecting to buy proxies...</p>
-            </div>
-          )}
-
-          {paymentStatus !== "success" && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount (KES)</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  placeholder="Enter amount"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  min={10}
-                  required
-                  className="h-11 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
-                />
-                <div className="flex flex-wrap gap-2">
-                  {quickAmounts.map((amt) => (
-                    <Button
-                      key={amt}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleQuickAmount(amt)}
-                      className={amount === amt.toString() ? "border-accent bg-accent/10 transition-colors" : "bg-zinc-950/40 backdrop-blur-md border-border/50 hover:bg-accent/5 transition-colors"}
-                    >
-                      KES {amt}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">M-Pesa Phone Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="0712345678 or 254712345678"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  required
-                  className="h-11 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
-                />
-                <p className="text-xs text-muted-foreground">You will receive an STK push on this number</p>
-              </div>
-            </>
-          )}
-        </CardContent>
-        {paymentStatus !== "success" && (
-          <CardFooter className="pt-6 border-t border-border/10 mt-2">
-            <Button type="submit" className="w-full h-12 bg-accent hover:bg-accent/90 text-background font-semibold text-base transition-all duration-300 shadow-[0_0_15px_rgba(var(--color-accent),0.3)] hover:shadow-[0_0_25px_rgba(var(--color-accent),0.5)] rounded-xl" disabled={loading || !amount || !phoneNumber}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                `Top Up KES ${amount || "0"}`
-              )}
-            </Button>
-          </CardFooter>
+        {/* Error Message */}
+        {error && (
+          <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-xs text-destructive flex items-center gap-2">
+            <GoogleIcon name="error" size={16} className="shrink-0" />
+            <span>{error}</span>
+          </div>
         )}
+
+        {/* Pending State */}
+        {paymentStatus === "pending" && (
+          <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 text-center space-y-1.5">
+            <GoogleIcon name="progress_activity" size={24} className="mx-auto animate-spin text-emerald-500" />
+            <p className="text-xs font-semibold text-foreground">Waiting for M-Pesa Confirmation...</p>
+            <p className="text-[11px] text-muted-foreground">
+              Please check your phone and enter your M-Pesa PIN.
+            </p>
+          </div>
+        )}
+
+        {/* Success State */}
+        {paymentStatus === "success" && (
+          <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/30 p-4 text-center space-y-1.5">
+            <GoogleIcon name="check_circle" size={26} className="mx-auto text-emerald-500" />
+            <p className="text-sm font-bold text-emerald-500">Payment Successful!</p>
+            <p className="text-[11px] text-muted-foreground">
+              Your wallet balance has been credited. Redirecting to Buy Proxies...
+            </p>
+          </div>
+        )}
+
+        {/* Submit Action Button */}
+        {paymentStatus !== "success" && (
+          <Button
+            type="submit"
+            disabled={loading || !amount || !phoneNumber}
+            className="w-full h-11 bg-emerald-500 hover:bg-emerald-600 text-black font-semibold text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-500/20 transition-all"
+          >
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <GoogleIcon name="progress_activity" size={16} className="animate-spin" />
+                Sending STK Push...
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5">
+                <GoogleIcon name="lock" size={15} />
+                Top Up KES {amount ? Number.parseInt(amount || "0").toLocaleString() : "0"} via M-Pesa
+              </span>
+            )}
+          </Button>
+        )}
+
+        {/* Security footnote */}
+        <div className="flex items-center justify-center gap-2 text-[11px] text-muted-foreground pt-1">
+          <GoogleIcon name="verified_user" size={14} className="text-emerald-500" />
+          <span>Encrypted 256-bit M-Pesa integration</span>
+        </div>
       </form>
-    </Card>
+    </div>
   )
 }

@@ -11,14 +11,7 @@ export default async function AdminPage() {
       <div className="min-h-screen bg-background">
         <Header user={{ email: user.email, name: user.name, role: user.role }} />
 
-        <main className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="mt-2 text-muted-foreground">Manage proxies, pricing, and orders</p>
-          </div>
-
-          <AdminDashboard />
-        </main>
+        <AdminDashboard />
       </div>
     )
   } catch {

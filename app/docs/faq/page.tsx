@@ -2,7 +2,7 @@ import { Header } from '@/components/header'
 import { getSession } from '@/lib/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ExternalLink, Send } from 'lucide-react'
+import { GoogleIcon } from '@/components/ui/google-icon'
 import Link from 'next/link'
 
 export const metadata = {
@@ -240,27 +240,27 @@ export default async function FAQPage() {
     <main className="min-h-screen bg-background">
       <Header user={session?.user ? { email: session.user.email, name: session.user.name, role: session.user.role } : null} />
 
-      <div className="border-b border-border">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold">Frequently Asked Questions</h1>
-          <p className="mt-2 text-lg text-muted-foreground">
+      <div className="border-b border-border bg-secondary/30">
+        <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">Frequently Asked Questions</h1>
+          <p className="mt-0.5 text-xs text-muted-foreground">
             Find answers to common questions about RayProxy Hub
           </p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 space-y-12">
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 space-y-6">
         {faqCategories.map((category, categoryIndex) => (
           <div key={categoryIndex}>
-            <h2 className="mb-6 text-2xl font-bold">{category.category}</h2>
-            <div className="space-y-4">
+            <h2 className="mb-2.5 text-xs font-bold uppercase tracking-wider text-accent">{category.category}</h2>
+            <div className="space-y-2">
               {category.questions.map((item, questionIndex) => (
-                <Card key={`${categoryIndex}-${questionIndex}`}>
-                  <CardHeader>
-                    <CardTitle className="text-base">{item.q}</CardTitle>
+                <Card key={`${categoryIndex}-${questionIndex}`} className="bg-card border-border shadow-xs rounded-xl">
+                  <CardHeader className="p-3 pb-1">
+                    <CardTitle className="text-xs font-semibold text-foreground">{item.q}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{item.a}</p>
+                  <CardContent className="p-3 pt-0">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{item.a}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -269,24 +269,24 @@ export default async function FAQPage() {
         ))}
 
         {/* Still Have Questions */}
-        <Card className="border-accent/50 bg-accent/5">
-          <CardHeader>
-            <CardTitle>Didn't find your answer?</CardTitle>
-            <CardDescription>
+        <Card className="border-accent/30 bg-accent/5 rounded-xl">
+          <CardHeader className="p-3.5">
+            <CardTitle className="text-xs font-semibold text-foreground">Didn't find your answer?</CardTitle>
+            <CardDescription className="text-[11px] text-muted-foreground">
               Our support team is here to help you with any questions
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4 sm:flex-row">
-            <Button asChild>
-              <Link href="/support" className="inline-flex items-center gap-2">
-                <Send className="h-4 w-4" />
+          <CardContent className="p-3.5 pt-0 flex flex-col gap-2 sm:flex-row">
+            <Button asChild size="sm" className="h-7 text-xs bg-accent hover:bg-accent/90 text-background rounded-lg">
+              <Link href="/support" className="inline-flex items-center gap-1.5">
+                <GoogleIcon name="send" size={13} />
                 Contact Support
               </Link>
             </Button>
-            <Button asChild variant="outline">
-              <Link href="/docs" className="inline-flex items-center gap-2">
+            <Button asChild variant="outline" size="sm" className="h-7 text-xs border-border/40 rounded-lg">
+              <Link href="/docs" className="inline-flex items-center gap-1.5">
                 View Documentation
-                <ExternalLink className="h-4 w-4" />
+                <GoogleIcon name="open_in_new" size={12} />
               </Link>
             </Button>
           </CardContent>

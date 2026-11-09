@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Loader2, Plus, Trash2, Mail, Edit2 } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -398,7 +398,7 @@ export function PricingManagement() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <GoogleIcon name="progress_activity" size={24} className="animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -407,7 +407,7 @@ export function PricingManagement() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="rounded-full bg-destructive/10 p-4 mb-4">
-          <Mail className="h-12 w-12 text-destructive" />
+          <GoogleIcon name="payments" size={36} className="text-destructive" />
         </div>
         <h2 className="text-xl font-bold text-destructive">Error Loading Data</h2>
         <p className="text-muted-foreground mt-2">{error}</p>
@@ -426,8 +426,8 @@ export function PricingManagement() {
         <TabsContent value="proxy" className="space-y-6">
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button size="sm" className="h-8 text-xs gap-1.5">
+                <GoogleIcon name="add" size={15} />
                 Add Country Pricing
               </Button>
             </DialogTrigger>
@@ -466,8 +466,8 @@ export function PricingManagement() {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={handleAddPricing} disabled={submitting}>
-                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button onClick={handleAddPricing} disabled={submitting} size="sm" className="h-8 text-xs">
+                  {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
                   Add Pricing
                 </Button>
               </DialogFooter>
@@ -505,11 +505,11 @@ export function PricingManagement() {
                           />
                         </TableCell>
                         <TableCell className="flex gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEditProxyPricing(item)}>
-                            <Edit2 className="h-4 w-4 text-blue-500" />
+                          <Button variant="ghost" size="icon" onClick={() => handleEditProxyPricing(item)} className="h-8 w-8">
+                            <GoogleIcon name="edit" size={14} className="text-blue-500" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)} className="h-8 w-8">
+                            <GoogleIcon name="delete" size={14} className="text-destructive" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -524,8 +524,8 @@ export function PricingManagement() {
         <TabsContent value="email" className="space-y-6">
           <Dialog open={addEmailPricingOpen} onOpenChange={setAddEmailPricingOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button size="sm" className="h-8 text-xs gap-1.5">
+                <GoogleIcon name="add" size={15} />
                 Add Email Domain Pricing
               </Button>
             </DialogTrigger>
@@ -561,8 +561,8 @@ export function PricingManagement() {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={handleAddEmailPricing} disabled={submitting}>
-                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button onClick={handleAddEmailPricing} disabled={submitting} size="sm" className="h-8 text-xs">
+                  {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
                   Add Pricing
                 </Button>
               </DialogFooter>
@@ -590,7 +590,7 @@ export function PricingManagement() {
                     {emailPricing.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-accent" />
+                          <GoogleIcon name="mail" size={14} className="text-accent" />
                           {item.domain}
                         </TableCell>
                         <TableCell>KES {item.pricePerEmail}</TableCell>
@@ -601,11 +601,11 @@ export function PricingManagement() {
                           />
                         </TableCell>
                         <TableCell className="flex gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEditEmailPricing(item)}>
-                            <Edit2 className="h-4 w-4 text-blue-500" />
+                          <Button variant="ghost" size="icon" onClick={() => handleEditEmailPricing(item)} className="h-8 w-8">
+                            <GoogleIcon name="edit" size={14} className="text-blue-500" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeleteEmailPricing(item.id)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteEmailPricing(item.id)} className="h-8 w-8">
+                            <GoogleIcon name="delete" size={14} className="text-destructive" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -636,8 +636,8 @@ export function PricingManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleSaveEditProxyPricing} disabled={submitting}>
-              {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button onClick={handleSaveEditProxyPricing} disabled={submitting} size="sm" className="h-8 text-xs">
+              {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
               Save Changes
             </Button>
           </DialogFooter>
@@ -662,8 +662,8 @@ export function PricingManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleSaveEditEmailPricing} disabled={submitting}>
-              {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button onClick={handleSaveEditEmailPricing} disabled={submitting} size="sm" className="h-8 text-xs">
+              {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
               Save Changes
             </Button>
           </DialogFooter>

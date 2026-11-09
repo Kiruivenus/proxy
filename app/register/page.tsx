@@ -8,7 +8,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Globe, Loader2, Mail, Lock, ArrowRight, User, ShieldCheck } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -74,7 +74,7 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-screen bg-background font-sans">
       {/* Left Visual Section */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden bg-zinc-950 border-r border-border/40">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden bg-muted/30 dark:bg-zinc-950 border-r border-border">
         {/* Abstract Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-background to-background" />
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-accent/20 blur-[120px]" />
@@ -82,11 +82,17 @@ export default function RegisterPage() {
         
         {/* Branding */}
         <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center gap-2.5 transition-transform hover:scale-105 duration-300">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900 border border-border/40 p-1.5 overflow-hidden">
-              <img src="/logo.png" alt="RayProxy" className="h-[145%] w-auto max-w-none object-contain -translate-y-[8%]" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight text-foreground">RayProxy Hub</span>
+          <Link href="/" className="inline-flex items-center transition-transform hover:scale-105 duration-300">
+            <img
+              src="/logo-horizontal-dark.png"
+              alt="RayProxy"
+              className="h-12 sm:h-14 w-auto object-contain hidden dark:block"
+            />
+            <img
+              src="/logo-horizontal-light.png"
+              alt="RayProxy"
+              className="h-12 sm:h-14 w-auto object-contain block dark:hidden"
+            />
           </Link>
         </div>
 
@@ -100,13 +106,13 @@ export default function RegisterPage() {
             Join thousands of developers bypassing restrictions and scaling data extraction globally.
           </p>
           
-          <div className="mt-10 space-y-4">
-            <div className="flex items-center gap-3 text-foreground/90">
-              <ShieldCheck className="h-5 w-5 text-accent" />
+          <div className="mt-8 space-y-3">
+            <div className="flex items-center gap-2.5 text-foreground/90 text-xs">
+              <GoogleIcon name="verified_user" size={16} className="text-accent" />
               <span>Bank-level encryption and security</span>
             </div>
-            <div className="flex items-center gap-3 text-foreground/90">
-              <Globe className="h-5 w-5 text-accent" />
+            <div className="flex items-center gap-2.5 text-foreground/90 text-xs">
+              <GoogleIcon name="public" size={16} className="text-accent" />
               <span>Access to 10M+ IPs worldwide</span>
             </div>
           </div>
@@ -134,31 +140,42 @@ export default function RegisterPage() {
         </div>
         
         <div className="w-full max-w-[420px] relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out py-8">
-          <div className="lg:hidden flex items-center justify-center gap-2.5 mb-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900 border border-border/40 p-1.5 overflow-hidden">
-              <img src="/logo.png" alt="RayProxy" className="h-[145%] w-auto max-w-none object-contain -translate-y-[8%]" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight">RayProxy</span>
+          <div className="lg:hidden flex items-center justify-center mb-8">
+            <Link href="/" className="inline-flex items-center">
+              <img
+                src="/logo-horizontal-dark.png"
+                alt="RayProxy"
+                className="h-10 sm:h-11 w-auto object-contain hidden dark:block"
+              />
+              <img
+                src="/logo-horizontal-light.png"
+                alt="RayProxy"
+                className="h-10 sm:h-11 w-auto object-contain block dark:hidden"
+              />
+            </Link>
           </div>
 
-          <div className="text-center lg:text-left mb-8">
-            <h2 className="text-3xl font-semibold tracking-tight mb-2 text-foreground">Create an account</h2>
-            <p className="text-muted-foreground">Join thousands of satisfied users today</p>
+          <div className="text-center lg:text-left mb-6">
+            <h2 className="text-xl font-bold tracking-tight mb-1 text-foreground">Create an account</h2>
+            <p className="text-xs text-muted-foreground">Join thousands of satisfied users today</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {error && (
-              <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive animate-in fade-in slide-in-from-top-2">
-                {error}
+              <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive flex items-center gap-2">
+                <GoogleIcon name="error" size={15} />
+                <span>{error}</span>
               </div>
             )}
             
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium text-foreground/90">
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-xs font-medium text-foreground/90">
                 Full Name
               </Label>
               <div className="relative group">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors duration-300" />
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent">
+                  <GoogleIcon name="person" size={16} />
+                </div>
                 <Input
                   id="name"
                   type="text"
@@ -166,17 +183,19 @@ export default function RegisterPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="pl-10 h-12 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
+                  className="pl-8 h-9 text-xs bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-accent"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-foreground/90">
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs font-medium text-foreground/90">
                 Email Address
               </Label>
               <div className="relative group">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors duration-300" />
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent">
+                  <GoogleIcon name="mail" size={16} />
+                </div>
                 <Input
                   id="email"
                   type="email"
@@ -184,17 +203,19 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10 h-12 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
+                  className="pl-8 h-9 text-xs bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-accent"
                 />
               </div>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-foreground/90">
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-xs font-medium text-foreground/90">
                 Password
               </Label>
               <div className="relative group">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors duration-300" />
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent">
+                  <GoogleIcon name="lock" size={16} />
+                </div>
                 <Input
                   id="password"
                   type="password"
@@ -202,16 +223,16 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pl-10 h-12 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
+                  className="pl-8 h-9 text-xs bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-accent"
                 />
               </div>
               {password.length > 0 && (
-                <div className="pt-2 animate-in fade-in duration-300">
-                  <div className="flex gap-1 h-1.5 w-full rounded-full overflow-hidden">
+                <div className="pt-1">
+                  <div className="flex gap-1 h-1 w-full rounded-full overflow-hidden">
                     {[1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
-                        className={`flex-1 transition-all duration-500 ${
+                        className={`flex-1 transition-all duration-300 ${
                           strength >= i 
                             ? strength <= 2 ? "bg-amber-500" : "bg-accent" 
                             : "bg-muted"
@@ -219,7 +240,7 @@ export default function RegisterPage() {
                       />
                     ))}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1.5 text-right">
+                  <p className="text-[10px] text-muted-foreground mt-1 text-right">
                     {strength <= 1 && "Weak"}
                     {strength === 2 && "Fair"}
                     {strength === 3 && "Good"}
@@ -229,12 +250,14 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground/90">
+            <div className="space-y-1.5">
+              <Label htmlFor="confirmPassword" className="text-xs font-medium text-foreground/90">
                 Confirm Password
               </Label>
               <div className="relative group">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors duration-300" />
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent">
+                  <GoogleIcon name="lock" size={16} />
+                </div>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -242,28 +265,28 @@ export default function RegisterPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="pl-10 h-12 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
+                  className="pl-8 h-9 text-xs bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-accent"
                 />
               </div>
             </div>
 
             <Button 
               type="submit" 
-              className="group w-full h-12 mt-4 bg-accent hover:bg-accent/90 text-background font-semibold text-base transition-all duration-300 shadow-[0_0_15px_rgba(var(--color-accent),0.3)] hover:shadow-[0_0_25px_rgba(var(--color-accent),0.5)]" 
+              className="group w-full h-9 mt-2 bg-accent hover:bg-accent/90 text-background font-semibold text-xs transition-colors rounded-lg shadow-sm" 
               disabled={loading}
             >
               {loading ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <GoogleIcon name="progress_activity" size={16} className="mr-2 animate-spin" />
               ) : (
                 <>
                   Create Account
-                  <ArrowRight className="ml-2 h-5 w-5 opacity-70 group-hover:translate-x-1 transition-transform" />
+                  <GoogleIcon name="arrow_forward" size={14} className="ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                 </>
               )}
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-8 pb-4">
+          <p className="text-center text-xs text-muted-foreground mt-6 pb-2">
             Already have an account?{" "}
             <Link href="/login" className="font-semibold text-foreground hover:text-accent transition-colors">
               Sign in

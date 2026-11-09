@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Plus } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 import { parseProxyString } from "@/lib/proxy-parser"
 
 interface PricingItem {
@@ -142,8 +142,8 @@ export function AddProxyModal({ pricing, onAdd, noPricingConfigured }: AddProxyM
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button disabled={noPricingConfigured}>
-          <Plus className="mr-2 h-4 w-4" />
+        <Button disabled={noPricingConfigured} size="sm" className="h-8 text-xs gap-1.5">
+          <GoogleIcon name="add" size={15} />
           Add Proxy
         </Button>
       </DialogTrigger>
@@ -251,8 +251,8 @@ export function AddProxyModal({ pricing, onAdd, noPricingConfigured }: AddProxyM
           <Button variant="outline" type="button" onClick={handleClear} disabled={submitting}>
             Clear
           </Button>
-          <Button onClick={handleSubmit} disabled={submitting || !form.country || !form.ip || !form.port}>
-            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button onClick={handleSubmit} disabled={submitting || !form.country || !form.ip || !form.port} size="sm" className="h-8 text-xs">
+            {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
             Add Proxy
           </Button>
         </DialogFooter>

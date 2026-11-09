@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2 } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 interface Proxy {
   id: string
@@ -140,8 +140,8 @@ export function EditProxyModal({ proxy, open, onOpenChange, onSave }: EditProxyM
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit} disabled={submitting || !form.ip || !form.port}>
-            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button onClick={handleSubmit} disabled={submitting || !form.ip || !form.port} size="sm" className="h-8 text-xs">
+            {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
             Save Changes
           </Button>
         </DialogFooter>

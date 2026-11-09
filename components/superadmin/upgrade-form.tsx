@@ -8,25 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { 
-  Check, 
-  CreditCard, 
-  ChevronRight, 
-  ShieldCheck, 
-  Zap, 
-  Globe, 
-  BarChart3, 
-  Lock, 
-  Box, 
-  Users, 
-  Plus,
-  Loader2,
-  Calendar,
-  Shield,
-  Circle,
-  AlertCircle,
-  Info
-} from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 import { toast } from "sonner"
 
 export function UpgradeForm({ userName }: { userName: string }) {
@@ -163,17 +145,17 @@ export function UpgradeForm({ userName }: { userName: string }) {
     }
   }
 
-  const VisualCardLabel = <p className="text-[11px] font-medium text-zinc-400 mb-2">C<span>a</span>rd N<span>u</span>mber</p>
-  const VisualExpiryLabel = <p className="text-[11px] font-medium text-zinc-400 mb-2">Expir<span>a</span>tion D<span>a</span>te</p>
-  const VisualCvcLabel = <p className="text-[11px] font-medium text-zinc-400 mb-2">Secur<span>i</span>ty C<span>o</span>de</p>
-  const VisualNameLabel = <p className="text-[11px] font-medium text-zinc-400 mb-2">Full N<span>a</span>me</p>
+  const VisualCardLabel = <p className="text-[11px] font-medium text-muted-foreground mb-2">C<span>a</span>rd N<span>u</span>mber</p>
+  const VisualExpiryLabel = <p className="text-[11px] font-medium text-muted-foreground mb-2">Expir<span>a</span>tion D<span>a</span>te</p>
+  const VisualCvcLabel = <p className="text-[11px] font-medium text-muted-foreground mb-2">Secur<span>i</span>ty C<span>o</span>de</p>
+  const VisualNameLabel = <p className="text-[11px] font-medium text-muted-foreground mb-2">Full N<span>a</span>me</p>
 
   return (
-    <div className="flex flex-col lg:flex-row w-full max-w-6xl mx-auto bg-black rounded-xl overflow-hidden border border-zinc-800 shadow-2xl">
+    <div className="flex flex-col lg:flex-row w-full max-w-6xl mx-auto bg-card rounded-xl overflow-hidden border border-border text-card-foreground shadow-2xl">
       {/* Left Sidebar */}
-      <div className="w-full lg:w-80 bg-zinc-950 p-6 border-r border-zinc-800">
+      <div className="w-full lg:w-80 bg-secondary/40 p-6 border-r border-border">
         <h3 className="text-sm font-semibold mb-6">What's included</h3>
-        <ul className="space-y-4 text-zinc-400">
+        <ul className="space-y-4 text-muted-foreground">
           {[
             { t: "Flexible usage credit", s: "For use towards metered resources" },
             { t: "Fast Data Transfer", s: "1 TB /month included" },
@@ -187,10 +169,10 @@ export function UpgradeForm({ userName }: { userName: string }) {
             { t: "Enterprise-grade paid add-ons", s: "SAML SSO, HIPAA BAA, and more" },
           ].map((f, i) => (
             <li key={i} className="flex gap-3">
-              <Check className="h-4 w-4 mt-0.5 text-zinc-100 flex-shrink-0" />
+              <GoogleIcon name="check" size={16} className="mt-0.5 text-foreground shrink-0" />
               <div>
-                <p className="text-sm font-medium text-zinc-100 leading-tight">{f.t}</p>
-                <p className="text-[11px] text-zinc-500 mt-0.5">{f.s}</p>
+                <p className="text-sm font-medium text-foreground leading-tight">{f.t}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">{f.s}</p>
               </div>
             </li>
           ))}
@@ -198,10 +180,10 @@ export function UpgradeForm({ userName }: { userName: string }) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 bg-black p-6 md:p-8 lg:p-12 relative flex flex-col justify-center">
+      <div className="flex-1 bg-card p-6 md:p-8 lg:p-12 relative flex flex-col justify-center">
         {!success && (
           <button onClick={() => router.push("/admin/settings")} className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-transform hover:scale-110">
-            <Plus className="h-5 w-5 rotate-45" />
+            <GoogleIcon name="close" size={20} />
           </button>
         )}
 
@@ -209,7 +191,7 @@ export function UpgradeForm({ userName }: { userName: string }) {
           {success ? (
             <div className="text-center space-y-8 animate-in fade-in zoom-in duration-700">
               <div className="mx-auto w-24 h-24 rounded-full bg-green-500/10 flex items-center justify-center border border-green-500/30">
-                <Check className="h-12 w-12 text-green-500" />
+                <GoogleIcon name="check" size={48} className="text-green-500" />
               </div>
               <h2 className="text-3xl font-bold text-white tracking-tight">Payment Successful!</h2>
               <Button 
@@ -234,17 +216,17 @@ export function UpgradeForm({ userName }: { userName: string }) {
               <form onSubmit={handleUpgrade} className="space-y-6">
                 {errors.general && (
                   <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg flex items-center gap-3 text-red-500 text-sm animate-in fade-in slide-in-from-top-2 mb-4">
-                    <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                    <GoogleIcon name="error" size={20} className="shrink-0" />
                     <p className="font-medium">{errors.general}</p>
                   </div>
                 )}
 
-                <div className="flex items-center justify-between p-4 bg-zinc-900/50 rounded-lg border border-zinc-800 shadow-inner">
+                <div className="flex items-center justify-between p-4 bg-secondary/40 rounded-lg border border-border shadow-xs">
                   <div className="flex items-center gap-3">
-                    <Box className="h-4 w-4 text-blue-500" />
+                    <GoogleIcon name="inventory_2" size={16} className="text-blue-500" />
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-semibold">Included credit</span>
-                      <Info className="h-3 w-3 text-zinc-600" />
+                      <span className="text-sm font-semibold text-foreground">Included credit</span>
+                      <GoogleIcon name="info" size={12} className="text-muted-foreground" />
                     </div>
                   </div>
                   <span className="text-sm font-bold text-blue-500">$20</span>
@@ -253,26 +235,25 @@ export function UpgradeForm({ userName }: { userName: string }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div 
                     onClick={() => setPaymentMethod("card")}
-                    className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === "card" ? "border-blue-500 bg-blue-500/5" : "border-zinc-800 bg-zinc-900/30 hover:border-zinc-700"}`}
+                    className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === "card" ? "border-blue-500 bg-blue-500/5" : "border-border bg-secondary/30 hover:border-border/80"}`}
                   >
-                    <CreditCard className={`h-5 w-5 mb-2 ${paymentMethod === "card" ? "text-blue-400" : "text-zinc-500"}`} />
-                    <span className={`text-xs font-bold uppercase ${paymentMethod === "card" ? "text-blue-400" : "text-zinc-500"}`}>CARD</span>
+                    <GoogleIcon name="credit_card" size={20} className={`mb-2 ${paymentMethod === "card" ? "text-blue-500" : "text-muted-foreground"}`} />
+                    <span className={`text-xs font-bold uppercase ${paymentMethod === "card" ? "text-blue-500" : "text-muted-foreground"}`}>CARD</span>
                   </div>
                   <div 
                     onClick={() => setPaymentMethod("google-pay")}
-                    className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === "google-pay" ? "border-blue-500 bg-blue-500/5" : "border-zinc-800 bg-zinc-900/30 hover:border-zinc-700"}`}
+                    className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === "google-pay" ? "border-blue-500 bg-blue-500/5" : "border-border bg-secondary/30 hover:border-border/80"}`}
                   >
                     <div className="flex items-center gap-1.5 mb-2">
-                       <Circle className={`h-2.5 w-2.5 fill-current ${paymentMethod === "google-pay" ? "text-blue-400" : "text-zinc-500"}`} />
-                       <span className={`text-[10px] font-bold ${paymentMethod === "google-pay" ? "text-blue-400" : "text-zinc-500"}`}>Pay</span>
+                       <span className={`text-[10px] font-bold ${paymentMethod === "google-pay" ? "text-blue-500" : "text-muted-foreground"}`}>GPay</span>
                     </div>
-                    <span className={`text-xs font-bold uppercase ${paymentMethod === "google-pay" ? "text-blue-400" : "text-zinc-500"}`}>GOOGLE PAY</span>
+                    <span className={`text-xs font-bold uppercase ${paymentMethod === "google-pay" ? "text-blue-500" : "text-muted-foreground"}`}>GOOGLE PAY</span>
                   </div>
                 </div>
 
                 <div className="space-y-6">
                    <div className="flex items-center gap-2 text-blue-500 text-[11px] font-bold cursor-pointer hover:text-blue-400 transition-colors">
-                      <Lock className="h-3.5 w-3.5" /> Use saved payment <ChevronRight className="h-3.5 w-3.5 rotate-90" />
+                      <GoogleIcon name="lock" size={14} /> Use saved payment <GoogleIcon name="chevron_right" size={14} className="rotate-90" />
                    </div>
 
                    <div className={`space-y-4 transition-opacity ${paymentMethod === "google-pay" ? "opacity-30 pointer-events-none" : "opacity-100"}`}>
@@ -282,7 +263,7 @@ export function UpgradeForm({ userName }: { userName: string }) {
                           <div className="relative">
                             <Input 
                               placeholder="•••• •••• •••• ••••" 
-                              className={`bg-zinc-900/50 h-11 border-zinc-800 transition-all font-mono ${errors.cardNumber ? "border-red-500 ring-1 ring-red-500/50" : "focus:border-blue-500/50"}`} 
+                              className={`bg-background h-11 border-border transition-all font-mono text-foreground ${errors.cardNumber ? "border-red-500 ring-1 ring-red-500/50" : "focus:border-blue-500/50"}`} 
                               value={cardNumber}
                               onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                               maxLength={19}
@@ -303,7 +284,7 @@ export function UpgradeForm({ userName }: { userName: string }) {
                           {VisualExpiryLabel}
                           <Input 
                             placeholder="•• / ••" 
-                            className={`bg-zinc-900/50 h-11 border-zinc-800 font-mono ${errors.expiry ? "border-red-500 ring-1 ring-red-500/50" : "focus:border-blue-500/50"}`} 
+                            className={`bg-background h-11 border-border font-mono text-foreground ${errors.expiry ? "border-red-500 ring-1 ring-red-500/50" : "focus:border-blue-500/50"}`} 
                             value={expiry}
                             onChange={(e) => setExpiry(formatExpiry(e.target.value))}
                             maxLength={7}
@@ -319,7 +300,7 @@ export function UpgradeForm({ userName }: { userName: string }) {
                           <div className="relative">
                             <Input 
                               placeholder="•••" 
-                              className={`bg-zinc-900/50 h-11 border-zinc-800 font-mono ${errors.cvc ? "border-red-500 ring-1 ring-red-500/50" : "focus:border-blue-500/50"}`} 
+                              className={`bg-background h-11 border-border font-mono text-foreground ${errors.cvc ? "border-red-500 ring-1 ring-red-500/50" : "focus:border-blue-500/50"}`} 
                               value={cvc}
                               onChange={(e) => setCvc(e.target.value.replace(/[^0-9]/g, "").substring(0, 3))}
                               maxLength={3}
@@ -327,14 +308,14 @@ export function UpgradeForm({ userName }: { userName: string }) {
                               autoComplete="off"
                               type="password"
                             />
-                            <CreditCard className="absolute right-3 top-3.5 h-4 w-4 text-zinc-600" />
+                            <GoogleIcon name="credit_card" size={16} className="absolute right-3 top-3.5 text-muted-foreground" />
                           </div>
                           {errors.cvc && <p className="text-[10px] text-red-500 font-medium">{errors.cvc}</p>}
                         </div>
                       </div>
                    </div>
 
-                   <p className="text-[11px] text-zinc-500 leading-tight">
+                   <p className="text-[11px] text-muted-foreground leading-tight">
                      By providing your card information, you allow RayProxy Hub to charge your card for future payments in accordance with their terms.
                    </p>
 
@@ -343,7 +324,7 @@ export function UpgradeForm({ userName }: { userName: string }) {
                         {VisualNameLabel}
                         <Input 
                           placeholder="••••••" 
-                          className="bg-zinc-900/50 h-11 border-zinc-800" 
+                          className="bg-background h-11 border-border text-foreground" 
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           name="q_z_4"
@@ -352,12 +333,12 @@ export function UpgradeForm({ userName }: { userName: string }) {
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-[11px] font-medium text-zinc-400">Country Or Region</Label>
+                        <Label className="text-[11px] font-medium text-muted-foreground">Country Or Region</Label>
                         <Select defaultValue="kenya">
-                          <SelectTrigger className="bg-zinc-900/50 h-11 border-zinc-800">
+                          <SelectTrigger className="bg-background h-11 border-border text-foreground">
                             <SelectValue placeholder="Select country" />
                           </SelectTrigger>
-                          <SelectContent className="bg-zinc-950 border-zinc-800">
+                          <SelectContent className="bg-popover border-border">
                             <SelectItem value="kenya">Kenya</SelectItem>
                             <SelectItem value="united-states">United States</SelectItem>
                           </SelectContent>
@@ -365,13 +346,13 @@ export function UpgradeForm({ userName }: { userName: string }) {
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-[11px] font-medium text-zinc-400">Address Line 1</Label>
-                        <Input placeholder="Address" className="bg-zinc-900/50 h-11 border-zinc-800" name="q_z_5" autoComplete="off" />
+                        <Label className="text-[11px] font-medium text-muted-foreground">Address Line 1</Label>
+                        <Input placeholder="Address" className="bg-background h-11 border-border text-foreground" name="q_z_5" autoComplete="off" />
                       </div>
 
                       <div className="flex items-center space-x-2 pt-2">
-                        <Checkbox id="billing" className="border-zinc-700" defaultChecked />
-                        <label htmlFor="billing" className="text-[11px] text-zinc-500 font-medium leading-none">
+                        <Checkbox id="billing" className="border-border" defaultChecked />
+                        <label htmlFor="billing" className="text-[11px] text-muted-foreground font-medium leading-none">
                           Use the billing address as my team's primary address
                         </label>
                       </div>
@@ -395,7 +376,7 @@ export function UpgradeForm({ userName }: { userName: string }) {
                      <div className="flex justify-between items-center text-sm">
                         <div className="flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors">
                           <span className="text-zinc-300">1 member</span>
-                          <ChevronRight className="h-3 w-3" />
+                          <GoogleIcon name="chevron_right" size={12} />
                         </div>
                         <span className="text-zinc-500">$0</span>
                      </div>
@@ -411,7 +392,7 @@ export function UpgradeForm({ userName }: { userName: string }) {
                       className="w-full h-12 bg-white hover:bg-zinc-200 text-black font-bold rounded-lg transition-all shadow-xl shadow-white/5 active:scale-[0.98]"
                       disabled={loading}
                     >
-                      {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+                      {loading && <GoogleIcon name="progress_activity" size={18} className="mr-2 animate-spin" />}
                       Upgrade
                     </Button>
                     <Button 

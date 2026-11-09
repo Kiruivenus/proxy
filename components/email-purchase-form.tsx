@@ -1,11 +1,8 @@
 "use client"
 
-import React from "react"
-
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -15,8 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Loader2, AlertCircle, Mail, CheckCircle, Wallet, Smartphone } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 interface EmailDomain {
   _id: string
@@ -30,6 +26,8 @@ interface EmailPricing {
   pricePerEmail: number
 }
 
+const quickQuantities = [1, 5, 10, 25, 50]
+
 export function EmailPurchaseForm() {
   const router = useRouter()
   const [domains, setDomains] = useState<EmailDomain[]>([])
@@ -38,11 +36,10 @@ export function EmailPurchaseForm() {
   const [selectedDomain, setSelectedDomain] = useState<string>("")
   const [quantity, setQuantity] = useState<string>("1")
   const [balance, setBalance] = useState<number>(0)
-  const [balanceLoading, setBalanceLoading] = useState(true)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
-  const [paymentMethod] = useState<"mpesa">("mpesa")
+  const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "balance">("mpesa")
   const [phoneNumber, setPhoneNumber] = useState("")
   const [availabilityError, setAvailabilityError] = useState("")
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "success" | "failed">("idle")
@@ -62,12 +59,16 @@ export function EmailPurchaseForm() {
 
       if (domainsRes.ok) {
         const data = await domainsRes.json()
-        setDomains(data.domains || [])
+        const domList = data.domains || []
+        setDomains(domList)
+        if (domList.length > 0) {
+          setSelectedDomain(domList[0]._id)
+        }
       }
 
       if (pricingRes.ok) {
         const data = await pricingRes.json()
-        const pricingMap = new Map(
+        const pricingMap = new Map<string, EmailPricing>(
           data.pricing?.map((p: EmailPricing) => [p.domainId, p]) || []
         )
         setPricing(pricingMap)
@@ -76,44 +77,36 @@ export function EmailPurchaseForm() {
       if (balanceRes.ok) {
         const data = await balanceRes.json()
         setBalance(data.balance || 0)
-      } else {
-        setBalance(0)
       }
 
       if (availableRes.ok) {
         const data = await availableRes.json()
-        const availableMap = new Map(
+        const availableMap = new Map<string, number>(
           data.available?.map((item: { domainId: string; count: number }) => [item.domainId, item.count]) || []
         )
         setAvailableEmails(availableMap)
       }
     } catch (err) {
       console.error("Failed to fetch data:", err)
-      setError("Failed to load email domains")
+      setError("Failed to load email configurations")
     } finally {
       setLoading(false)
-      setBalanceLoading(false)
     }
   }
 
   const selectedPricing = selectedDomain ? pricing.get(selectedDomain) : null
   const availableCount = selectedDomain ? (availableEmails.get(selectedDomain) || 0) : 0
-  const totalPrice = selectedPricing
-    ? selectedPricing.pricePerEmail * parseInt(quantity || "1")
-    : 0
-
+  const qtyNumber = Number.parseInt(quantity) || 1
+  const totalPrice = selectedPricing ? selectedPricing.pricePerEmail * qtyNumber : 0
+  const hasEnoughBalance = balance >= totalPrice && totalPrice > 0
 
   const handleQuantityChange = (value: string) => {
     setQuantity(value)
     setAvailabilityError("")
 
-    const qty = parseInt(value)
-    const available = availableEmails.get(selectedDomain) || 0
-
-    if (qty > available) {
-      setAvailabilityError(
-        `Only ${available} email${available === 1 ? "" : "s"} available for this domain`
-      )
+    const qty = Number.parseInt(value)
+    if (qty > availableCount) {
+      setAvailabilityError(`Only ${availableCount} email${availableCount === 1 ? "" : "s"} available in stock`)
     }
   }
 
@@ -130,14 +123,13 @@ export function EmailPurchaseForm() {
       return
     }
 
-    const qty = parseInt(quantity)
-    if (!quantity || qty < 1) {
+    if (!quantity || qtyNumber < 1) {
       setError("Please enter a valid quantity")
       setSubmitting(false)
       return
     }
 
-    if (qty > availableCount) {
+    if (qtyNumber > availableCount) {
       setAvailabilityError(`Only ${availableCount} email${availableCount === 1 ? "" : "s"} available`)
       setSubmitting(false)
       return
@@ -145,16 +137,9 @@ export function EmailPurchaseForm() {
 
     let formattedPhone = ""
     if (paymentMethod === "mpesa") {
-      if (!phoneNumber) {
-        setError("Please enter your phone number for M-Pesa payment")
-        setSubmitting(false)
-        return
-      }
-      
-      // Validate phone number (Kenyan format)
       const cleanPhone = phoneNumber.replace(/\D/g, "")
       if (!cleanPhone.match(/^(254|0)?[17]\d{8}$/)) {
-        setError("Please enter a valid M-Pesa phone number")
+        setError("Please enter a valid Safaricom phone number (e.g. 0712345678)")
         setSubmitting(false)
         return
       }
@@ -166,15 +151,13 @@ export function EmailPurchaseForm() {
           : `254${cleanPhone}`
     }
 
-
-
     try {
       const res = await fetch("/api/email-orders/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           domainId: selectedDomain,
-          quantity: parseInt(quantity),
+          quantity: qtyNumber,
           paymentMethod,
           phoneNumber: formattedPhone,
         }),
@@ -188,7 +171,15 @@ export function EmailPurchaseForm() {
         return
       }
 
-
+      // If paid via balance directly
+      if (data.status === "paid") {
+        setPaymentStatus("success")
+        setTimeout(() => {
+          router.push("/dashboard")
+          router.refresh()
+        }, 1500)
+        return
+      }
 
       // Initiate STK Push for M-Pesa
       setPaymentStatus("pending")
@@ -201,7 +192,7 @@ export function EmailPurchaseForm() {
       const stkData = await stkRes.json()
 
       if (!stkRes.ok) {
-        setError(stkData.error || "Failed to initiate payment")
+        setError(stkData.error || "Failed to initiate M-Pesa payment")
         setPaymentStatus("failed")
         setSubmitting(false)
         return
@@ -209,7 +200,7 @@ export function EmailPurchaseForm() {
 
       // Poll for payment status
       let attempts = 0
-      const maxAttempts = 30 // 60 seconds
+      const maxAttempts = 30
 
       const pollInterval = setInterval(async () => {
         attempts++
@@ -217,26 +208,29 @@ export function EmailPurchaseForm() {
         if (attempts >= maxAttempts) {
           clearInterval(pollInterval)
           setPaymentStatus("failed")
-          setError("Payment timeout. If money was deducted, please check your dashboard as it may take a few moments to process.")
+          setError("Payment timed out. If money was deducted, your credentials will appear in your dashboard shortly.")
           setSubmitting(false)
           return
         }
 
         try {
-          const statusRes = await fetch(`/api/mpesa/query-status?checkoutRequestId=${stkData.checkoutRequestId}&type=email`, { cache: "no-store" })
+          const statusRes = await fetch(
+            `/api/mpesa/query-status?checkoutRequestId=${stkData.checkoutRequestId}&type=email`,
+            { cache: "no-store" }
+          )
           const statusData = await statusRes.json()
 
-          if (statusData.status === "paid") {
+          if (statusData.status === "paid" || statusData.status === "completed") {
             clearInterval(pollInterval)
             setPaymentStatus("success")
             setTimeout(() => {
               router.push("/dashboard")
               router.refresh()
-            }, 2000)
+            }, 1800)
           } else if (statusData.status === "failed") {
             clearInterval(pollInterval)
             setPaymentStatus("failed")
-            setError(statusData.error || "Payment failed. If money was deducted, please check your dashboard as it may take a few moments to process.")
+            setError(statusData.error || "Payment was cancelled or failed.")
             setSubmitting(false)
           }
         } catch {
@@ -244,7 +238,7 @@ export function EmailPurchaseForm() {
         }
       }, 2000)
     } catch {
-      setError("Something went wrong")
+      setError("An unexpected error occurred. Please try again.")
       setPaymentStatus("failed")
       setSubmitting(false)
     }
@@ -252,200 +246,275 @@ export function EmailPurchaseForm() {
 
   if (loading) {
     return (
-      <Card className="bg-zinc-950/40 backdrop-blur-md border-border/40 shadow-xl">
-        <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-accent" />
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center py-20">
+        <GoogleIcon name="progress_activity" size={32} className="animate-spin text-emerald-500" />
+      </div>
     )
   }
 
   if (domains.length === 0) {
     return (
-      <Card className="bg-zinc-950/40 backdrop-blur-md border-border/40 shadow-xl">
-        <CardContent className="py-12 text-center">
-          <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground/50" />
-          <p className="mt-4 text-muted-foreground">No email domains available at the moment. Please check back later.</p>
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border border-border/80 bg-secondary/30 p-8 text-center max-w-md mx-auto">
+        <GoogleIcon name="mail" size={36} className="mx-auto text-muted-foreground/40 mb-3" />
+        <h3 className="text-sm font-semibold text-foreground">No Email Domains In Stock</h3>
+        <p className="text-xs text-muted-foreground mt-1">Please check back soon as new domains are provisioned regularly.</p>
+      </div>
     )
   }
 
+  const activeDomain = domains.find((d) => d._id === selectedDomain)
+
   return (
-    <Card className="bg-zinc-950/40 backdrop-blur-md border-border/40 shadow-xl">
-      <CardHeader>
-        <CardTitle>Select Email Domain</CardTitle>
-      </CardHeader>
-      <form onSubmit={handlePurchase}>
-        <CardContent className="space-y-6">
-          {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
-          )}
-
-          {paymentStatus === "pending" && (
-            <div className="rounded-md bg-accent/10 p-4 text-center">
-              <Loader2 className="mx-auto h-8 w-8 animate-spin text-accent" />
-              <p className="mt-2 font-medium">Check your phone for M-Pesa prompt</p>
-              <p className="text-sm text-muted-foreground">Enter your PIN to complete payment</p>
-            </div>
-          )}
-
-          {paymentStatus === "success" && (
-            <div className="rounded-md bg-green-500/10 p-4 text-center">
-              <CheckCircle className="mx-auto h-8 w-8 text-green-500" />
-              <p className="mt-2 font-medium text-green-500">Payment Successful!</p>
-              <p className="text-sm text-muted-foreground">Redirecting to your dashboard...</p>
-            </div>
-          )}
-
-          {paymentStatus !== "success" && (
-            <>
-              {/* Balance Display */}
-              <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
-                    <Wallet className="h-5 w-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Your Balance</p>
-                    <p className="text-xl font-bold">
-                      {balanceLoading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        `KES ${balance.toLocaleString()}`
-                      )}
-                    </p>
-                  </div>
-                </div>
-                <Button variant="outline" size="sm" type="button" onClick={() => router.push("/topup")}>
-                  Top Up
-                </Button>
-              </div>
-
-              {/* Domain Selection */}
-              <div className="space-y-2">
-                <Label>Email Domain</Label>
-                <Select value={selectedDomain} onValueChange={setSelectedDomain}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an email domain" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {domains.map((domain) => {
-                      const available = availableEmails.get(domain._id) || 0
-                      return (
-                        <SelectItem key={domain._id} value={domain._id}>
-                          <div className="flex items-center gap-2">
-                            <span>{domain.domain}</span>
-                            <span className="text-xs text-muted-foreground">
-                              ({domain.type === "gmail" ? "Gmail" : "RayProxy SMTP"})
-                            </span>
-                            <span className="ml-2 text-xs font-semibold text-accent">
-                              {available} available
-                            </span>
-                          </div>
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {selectedPricing && (
-                <>
-                  {/* Quantity Selection */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label>Number of Emails</Label>
-                      <span className="text-xs font-medium text-muted-foreground">
-                        Available: <span className="text-accent">{availableCount}</span>
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Input
-                        type="number"
-                        min="1"
-                        max={availableCount}
-                        value={quantity}
-                        onChange={(e) => handleQuantityChange(e.target.value)}
-                        placeholder="Enter quantity"
-                        className="h-11 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
-                      />
-                      <div className="whitespace-nowrap text-sm text-muted-foreground">
-                        KES {selectedPricing.pricePerEmail}/email
+    <div className="max-w-xl mx-auto">
+      <form onSubmit={handlePurchase} className="space-y-4">
+        {/* Domain Selection */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-semibold text-foreground">Email Domain</Label>
+            {activeDomain && (
+              <span className="text-[11px] font-medium text-emerald-500 dark:text-emerald-400">
+                {availableCount} in stock
+              </span>
+            )}
+          </div>
+          <Select value={selectedDomain} onValueChange={setSelectedDomain}>
+            <SelectTrigger className="h-11 text-xs sm:text-sm bg-secondary/40 dark:bg-zinc-900/60 border-border rounded-xl">
+              <SelectValue placeholder="Select email domain" />
+            </SelectTrigger>
+            <SelectContent>
+              {domains.map((domain) => {
+                const available = availableEmails.get(domain._id) || 0
+                const priceItem = pricing.get(domain._id)
+                return (
+                  <SelectItem key={domain._id} value={domain._id} className="text-xs py-2">
+                    <div className="flex items-center justify-between gap-4 w-full">
+                      <span className="font-medium">{domain.domain}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-muted-foreground uppercase">
+                          {domain.type === "gmail" ? "Gmail" : "SMTP"}
+                        </span>
+                        <span className="text-xs font-mono font-semibold text-foreground">
+                          KES {priceItem ? priceItem.pricePerEmail : 0}
+                        </span>
+                        <span className="text-[10px] bg-secondary px-1.5 py-0.5 rounded text-muted-foreground">
+                          {available} left
+                        </span>
                       </div>
                     </div>
-                    {availabilityError && (
-                      <p className="flex items-center gap-1 text-sm text-destructive">
-                        <AlertCircle className="h-4 w-4" /> {availabilityError}
-                      </p>
-                    )}
-                  </div>
+                  </SelectItem>
+                )
+              })}
+            </SelectContent>
+          </Select>
+        </div>
 
-                  {/* Price Summary */}
-                  <div className="rounded-md border bg-muted/50 p-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Price per email:</span>
-                        <span>KES {selectedPricing.pricePerEmail.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Quantity:</span>
-                        <span>{quantity}</span>
-                      </div>
-                      <div className="border-t border-border pt-2">
-                        <div className="flex justify-between font-bold">
-                          <span>Total Price:</span>
-                          <span className="text-accent">KES {totalPrice.toLocaleString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+        {/* Quantity Selector */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="email-quantity" className="text-xs font-semibold text-foreground">
+              Quantity
+            </Label>
+            {selectedPricing && (
+              <span className="text-xs font-mono text-muted-foreground">
+                KES {selectedPricing.pricePerEmail.toLocaleString()} each
+              </span>
+            )}
+          </div>
+          <Input
+            id="email-quantity"
+            type="number"
+            min="1"
+            max={availableCount > 0 ? availableCount : 1}
+            value={quantity}
+            onChange={(e) => handleQuantityChange(e.target.value)}
+            placeholder="Enter quantity"
+            className="h-11 text-xs sm:text-sm bg-secondary/40 dark:bg-zinc-900/60 border-border rounded-xl font-medium focus:border-emerald-500"
+          />
 
-                  {/* Payment Method - M-Pesa Only */}
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">M-Pesa Phone Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="0712345678 or 254712345678"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      required
-                      className="h-11 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
-                    />
-                    <p className="text-xs text-muted-foreground">You will receive an STK push on this number</p>
-                  </div>
-                </>
-              )}
-            </>
+          {/* Quick Quantity Buttons */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {quickQuantities.map((qty) => (
+              <button
+                key={qty}
+                type="button"
+                onClick={() => handleQuantityChange(qty.toString())}
+                className={`h-7 px-3 rounded-lg border text-xs font-medium transition-all ${
+                  quantity === qty.toString()
+                    ? "bg-emerald-500/15 border-emerald-500/50 text-emerald-500 dark:text-emerald-400 font-semibold"
+                    : "border-border/70 bg-secondary/40 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {qty} {qty === 1 ? "Account" : "Accounts"}
+              </button>
+            ))}
+          </div>
+
+          {availabilityError && (
+            <p className="flex items-center gap-1 text-[11px] text-destructive pt-1">
+              <GoogleIcon name="error" size={13} /> {availabilityError}
+            </p>
           )}
-        </CardContent>
-        {paymentStatus !== "success" && (
-          <CardFooter className="pt-6 border-t border-border/10 mt-2">
-            <Button
-              type="submit"
-              className="w-full h-12 bg-accent hover:bg-accent/90 text-background font-semibold text-base transition-all duration-300 shadow-[0_0_15px_rgba(var(--color-accent),0.3)] hover:shadow-[0_0_25px_rgba(var(--color-accent),0.5)] rounded-xl"
-              disabled={
-                submitting ||
-                !selectedDomain ||
-                !quantity ||
-                !!availabilityError ||
-                (paymentMethod === "mpesa" && !phoneNumber)
+        </div>
 
-              }
+        {/* Payment Method Toggle */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold text-foreground">Payment Method</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setPaymentMethod("mpesa")}
+              className={`flex items-center justify-center gap-2 h-11 px-3 rounded-xl border text-xs font-medium transition-all ${
+                paymentMethod === "mpesa"
+                  ? "bg-emerald-500/15 border-emerald-500/50 text-emerald-500 dark:text-emerald-400 font-semibold shadow-sm"
+                  : "bg-secondary/40 dark:bg-zinc-900/40 border-border/80 text-muted-foreground hover:text-foreground"
+              }`}
             >
-              {submitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                `Pay KES ${totalPrice.toLocaleString()} via M-Pesa`
+              <GoogleIcon name="phone_android" size={16} />
+              <span>M-Pesa STK Push</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (hasEnoughBalance) setPaymentMethod("balance")
+              }}
+              disabled={!hasEnoughBalance && totalPrice > 0}
+              className={`flex items-center justify-center gap-2 h-11 px-3 rounded-xl border text-xs font-medium transition-all ${
+                paymentMethod === "balance"
+                  ? "bg-emerald-500/15 border-emerald-500/50 text-emerald-500 dark:text-emerald-400 font-semibold shadow-sm"
+                  : !hasEnoughBalance && totalPrice > 0
+                  ? "bg-secondary/20 border-border/40 text-muted-foreground/40 cursor-not-allowed"
+                  : "bg-secondary/40 dark:bg-zinc-900/40 border-border/80 text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <GoogleIcon name="account_balance_wallet" size={16} />
+              <span>Wallet (KES {balance.toLocaleString()})</span>
+              {!hasEnoughBalance && totalPrice > 0 && (
+                <span className="text-[9px] bg-red-500/15 text-red-500 px-1 py-0.5 rounded border border-red-500/20">
+                  Low
+                </span>
               )}
-            </Button>
-          </CardFooter>
+            </button>
+          </div>
+        </div>
+
+        {/* Phone Input (if M-Pesa) */}
+        {paymentMethod === "mpesa" && (
+          <div className="space-y-1.5 animate-in fade-in duration-200">
+            <Label htmlFor="email-phone" className="text-xs font-semibold text-foreground">
+              M-Pesa Phone Number
+            </Label>
+            <div className="relative">
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-muted-foreground font-mono pointer-events-none">
+                <img
+                  src="https://flagcdn.com/20x15/ke.png"
+                  alt="Kenya"
+                  className="h-3 w-4 object-cover rounded-[2px]"
+                />
+                <span>+254</span>
+              </div>
+              <Input
+                id="email-phone"
+                type="tel"
+                placeholder="712345678 or 0712345678"
+                value={phoneNumber}
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value)
+                  setError("")
+                }}
+                required
+                className="pl-20 h-11 text-xs sm:text-sm bg-secondary/40 dark:bg-zinc-900/60 border-border rounded-xl font-mono focus:border-emerald-500"
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Enter your Safaricom number to receive an instant PIN prompt on your phone.
+            </p>
+          </div>
+        )}
+
+        {/* Order Price Breakdown */}
+        {selectedPricing && (
+          <div className="p-3.5 rounded-xl border border-border/70 bg-secondary/30 dark:bg-zinc-900/40 space-y-2 text-xs">
+            <div className="flex justify-between text-muted-foreground">
+              <span>Account Domain</span>
+              <span className="font-medium text-foreground">{activeDomain?.domain}</span>
+            </div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>Quantity</span>
+              <span className="font-mono text-foreground">{quantity}</span>
+            </div>
+            <div className="border-t border-border/60 pt-2 flex justify-between font-semibold">
+              <span className="text-foreground">Total Due:</span>
+              <span className="text-sm font-bold text-emerald-500 dark:text-emerald-400 font-mono">
+                KES {totalPrice.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-xs text-destructive flex items-center gap-2">
+            <GoogleIcon name="error" size={16} className="shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Pending State */}
+        {paymentStatus === "pending" && (
+          <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 text-center space-y-1.5">
+            <GoogleIcon name="progress_activity" size={24} className="mx-auto animate-spin text-emerald-500" />
+            <p className="text-xs font-semibold text-foreground">Waiting for M-Pesa PIN confirmation...</p>
+            <p className="text-[11px] text-muted-foreground">
+              Check your phone screen and authorize payment of KES {totalPrice.toLocaleString()}.
+            </p>
+          </div>
+        )}
+
+        {/* Success State */}
+        {paymentStatus === "success" && (
+          <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/30 p-4 text-center space-y-1.5">
+            <GoogleIcon name="check_circle" size={26} className="mx-auto text-emerald-500" />
+            <p className="text-sm font-bold text-emerald-500">Purchase Completed!</p>
+            <p className="text-[11px] text-muted-foreground">
+              Your email credentials are ready in your dashboard. Redirecting...
+            </p>
+          </div>
+        )}
+
+        {/* Submit Action Button */}
+        {paymentStatus !== "success" && (
+          <Button
+            type="submit"
+            disabled={
+              submitting ||
+              !selectedDomain ||
+              !quantity ||
+              !!availabilityError ||
+              (paymentMethod === "mpesa" && !phoneNumber) ||
+              (paymentMethod === "balance" && !hasEnoughBalance)
+            }
+            className="w-full h-11 bg-emerald-500 hover:bg-emerald-600 text-black font-semibold text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-500/20 transition-all"
+          >
+            {submitting ? (
+              <span className="flex items-center gap-2">
+                <GoogleIcon name="progress_activity" size={16} className="animate-spin" />
+                Processing Order...
+              </span>
+            ) : paymentMethod === "balance" ? (
+              <span className="flex items-center gap-1.5">
+                <GoogleIcon name="bolt" size={16} />
+                Purchase Now (KES {totalPrice.toLocaleString()})
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5">
+                <GoogleIcon name="lock" size={15} />
+                Pay KES {totalPrice.toLocaleString()} via M-Pesa
+              </span>
+            )}
+          </Button>
         )}
       </form>
-    </Card>
+    </div>
   )
 }

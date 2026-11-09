@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Globe, Loader2, Mail, Lock, ArrowRight, ArrowLeft, ShieldCheck, KeyRound, CheckCircle2 } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 type Step = "request" | "reset" | "success"
 
@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex min-h-screen bg-background font-sans">
       {/* Left Visual Section */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden bg-zinc-950 border-r border-border/40">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden bg-muted/30 dark:bg-zinc-950 border-r border-border">
         {/* Abstract Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-background to-background" />
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-accent/20 blur-[120px]" />
@@ -112,11 +112,17 @@ export default function ForgotPasswordPage() {
         
         {/* Branding */}
         <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center gap-2.5 transition-transform hover:scale-105 duration-300">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900 border border-border/40 p-1.5 overflow-hidden">
-              <img src="/logo.png" alt="RayProxy" className="h-[145%] w-auto max-w-none object-contain -translate-y-[8%]" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight text-foreground">RayProxy Hub</span>
+          <Link href="/" className="inline-flex items-center transition-transform hover:scale-105 duration-300">
+            <img
+              src="/logo-horizontal-dark.png"
+              alt="RayProxy"
+              className="h-12 sm:h-14 w-auto object-contain hidden dark:block"
+            />
+            <img
+              src="/logo-horizontal-light.png"
+              alt="RayProxy"
+              className="h-12 sm:h-14 w-auto object-contain block dark:hidden"
+            />
           </Link>
         </div>
 
@@ -130,9 +136,9 @@ export default function ForgotPasswordPage() {
             Follow the steps to securely verify your identity and regain access to your RayProxy account.
           </p>
           
-          <div className="mt-10 space-y-4">
-            <div className="flex items-center gap-3 text-foreground/90">
-              <ShieldCheck className="h-5 w-5 text-accent" />
+          <div className="mt-8 space-y-3">
+            <div className="flex items-center gap-2.5 text-foreground/90 text-xs">
+              <GoogleIcon name="verified_user" size={16} className="text-accent" />
               <span>Encrypted verification process</span>
             </div>
           </div>
@@ -158,24 +164,32 @@ export default function ForgotPasswordPage() {
         </div>
         
         <div className="w-full max-w-[420px] relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out py-8">
-          <div className="lg:hidden flex items-center justify-center gap-2.5 mb-10">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900 border border-border/40 p-1.5 overflow-hidden">
-              <img src="/logo.png" alt="RayProxy" className="h-[145%] w-auto max-w-none object-contain -translate-y-[8%]" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight">RayProxy</span>
+          <div className="lg:hidden flex items-center justify-center mb-10">
+            <Link href="/" className="inline-flex items-center">
+              <img
+                src="/logo-horizontal-dark.png"
+                alt="RayProxy"
+                className="h-10 sm:h-11 w-auto object-contain hidden dark:block"
+              />
+              <img
+                src="/logo-horizontal-light.png"
+                alt="RayProxy"
+                className="h-10 sm:h-11 w-auto object-contain block dark:hidden"
+              />
+            </Link>
           </div>
 
-          <div className="mb-8">
-            <Link href="/login" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-6 group">
-              <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          <div className="mb-6">
+            <Link href="/login" className="inline-flex items-center text-xs font-medium text-muted-foreground hover:text-foreground transition-colors mb-4 group">
+              <GoogleIcon name="arrow_back" size={14} className="mr-1.5 transition-transform group-hover:-translate-x-0.5" />
               Back to Login
             </Link>
-            <h2 className="text-3xl font-semibold tracking-tight mb-2 text-foreground">
+            <h2 className="text-xl font-bold tracking-tight mb-1 text-foreground">
               {step === "request" && "Recover access"}
               {step === "reset" && "Reset password"}
               {step === "success" && "Success!"}
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {step === "request" && "Enter your email to receive a reset code."}
               {step === "reset" && "Check your email for the reset code and enter your new password."}
               {step === "success" && "Your password has been successfully reset."}
@@ -184,19 +198,22 @@ export default function ForgotPasswordPage() {
 
           {/* Request Code Step */}
           {step === "request" && (
-            <form onSubmit={handleSendCode} className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+            <form onSubmit={handleSendCode} className="space-y-4">
               {error && (
-                <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive animate-in fade-in slide-in-from-top-2">
-                  {error}
+                <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive flex items-center gap-2">
+                  <GoogleIcon name="error" size={15} />
+                  <span>{error}</span>
                 </div>
               )}
               
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-foreground/90">
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-xs font-medium text-foreground/90">
                   Email Address
                 </Label>
                 <div className="relative group">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors duration-300" />
+                  <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent">
+                    <GoogleIcon name="mail" size={16} />
+                  </div>
                   <Input
                     id="email"
                     type="email"
@@ -204,22 +221,22 @@ export default function ForgotPasswordPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="pl-10 h-12 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
+                    className="pl-8 h-9 text-xs bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-accent"
                   />
                 </div>
               </div>
 
               <Button 
                 type="submit" 
-                className="group w-full h-12 mt-4 bg-accent hover:bg-accent/90 text-background font-semibold text-base transition-all duration-300 shadow-[0_0_15px_rgba(var(--color-accent),0.3)] hover:shadow-[0_0_25px_rgba(var(--color-accent),0.5)]" 
+                className="group w-full h-9 mt-2 bg-accent hover:bg-accent/90 text-background font-semibold text-xs transition-colors rounded-lg shadow-sm" 
                 disabled={loading}
               >
                 {loading ? (
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  <GoogleIcon name="progress_activity" size={16} className="mr-2 animate-spin" />
                 ) : (
                   <>
                     Send Reset Code
-                    <ArrowRight className="ml-2 h-5 w-5 opacity-70 group-hover:translate-x-1 transition-transform" />
+                    <GoogleIcon name="arrow_forward" size={14} className="ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                   </>
                 )}
               </Button>
@@ -228,28 +245,31 @@ export default function ForgotPasswordPage() {
 
           {/* Enter Code + New Password Step */}
           {step === "reset" && (
-            <form onSubmit={handleResetPassword} className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+            <form onSubmit={handleResetPassword} className="space-y-3.5">
               {error && (
-                <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive animate-in fade-in slide-in-from-top-2">
-                  {error}
+                <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive flex items-center gap-2">
+                  <GoogleIcon name="error" size={15} />
+                  <span>{error}</span>
                 </div>
               )}
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <Label htmlFor="code" className="text-sm font-medium text-foreground/90">
+                  <Label htmlFor="code" className="text-xs font-medium text-foreground/90">
                     Reset Code
                   </Label>
                   <button 
                     type="button" 
                     onClick={() => setStep("request")}
-                    className="text-xs text-accent hover:text-accent/80 transition-colors"
+                    className="text-[11px] text-accent hover:text-accent/80 transition-colors"
                   >
                     Resend code
                   </button>
                 </div>
                 <div className="relative group">
-                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors duration-300" />
+                  <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent">
+                    <GoogleIcon name="key" size={16} />
+                  </div>
                   <Input
                     id="code"
                     type="text"
@@ -257,17 +277,19 @@ export default function ForgotPasswordPage() {
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     required
-                    className="pl-10 h-12 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
+                    className="pl-8 h-9 text-xs bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-accent"
                   />
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground/90">
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-xs font-medium text-foreground/90">
                   New Password
                 </Label>
                 <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors duration-300" />
+                  <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent">
+                    <GoogleIcon name="lock" size={16} />
+                  </div>
                   <Input
                     id="password"
                     type="password"
@@ -275,16 +297,16 @@ export default function ForgotPasswordPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-10 h-12 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
+                    className="pl-8 h-9 text-xs bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-accent"
                   />
                 </div>
                 {password.length > 0 && (
-                  <div className="pt-2 animate-in fade-in duration-300">
-                    <div className="flex gap-1 h-1.5 w-full rounded-full overflow-hidden">
+                  <div className="pt-1">
+                    <div className="flex gap-1 h-1 w-full rounded-full overflow-hidden">
                       {[1, 2, 3, 4].map((i) => (
                         <div
                           key={i}
-                          className={`flex-1 transition-all duration-500 ${
+                          className={`flex-1 transition-all duration-300 ${
                             strength >= i 
                               ? strength <= 2 ? "bg-amber-500" : "bg-accent" 
                               : "bg-muted"
@@ -292,7 +314,7 @@ export default function ForgotPasswordPage() {
                         />
                       ))}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1.5 text-right">
+                    <p className="text-[10px] text-muted-foreground mt-1 text-right">
                       {strength <= 1 && "Weak"}
                       {strength === 2 && "Fair"}
                       {strength === 3 && "Good"}
@@ -302,12 +324,14 @@ export default function ForgotPasswordPage() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground/90">
+              <div className="space-y-1.5">
+                <Label htmlFor="confirmPassword" className="text-xs font-medium text-foreground/90">
                   Confirm Password
                 </Label>
                 <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors duration-300" />
+                  <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent">
+                    <GoogleIcon name="lock" size={16} />
+                  </div>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -315,22 +339,22 @@ export default function ForgotPasswordPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    className="pl-10 h-12 bg-zinc-950/40 backdrop-blur-md border-border/50 focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent transition-all duration-300"
+                    className="pl-8 h-9 text-xs bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-accent"
                   />
                 </div>
               </div>
 
               <Button 
                 type="submit" 
-                className="group w-full h-12 mt-4 bg-accent hover:bg-accent/90 text-background font-semibold text-base transition-all duration-300 shadow-[0_0_15px_rgba(var(--color-accent),0.3)] hover:shadow-[0_0_25px_rgba(var(--color-accent),0.5)]" 
+                className="group w-full h-9 mt-2 bg-accent hover:bg-accent/90 text-background font-semibold text-xs transition-colors rounded-lg shadow-sm" 
                 disabled={loading}
               >
                 {loading ? (
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  <GoogleIcon name="progress_activity" size={16} className="mr-2 animate-spin" />
                 ) : (
                   <>
                     Reset Password
-                    <ArrowRight className="ml-2 h-5 w-5 opacity-70 group-hover:translate-x-1 transition-transform" />
+                    <GoogleIcon name="arrow_forward" size={14} className="ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                   </>
                 )}
               </Button>
@@ -339,18 +363,18 @@ export default function ForgotPasswordPage() {
 
           {/* Success Step */}
           {step === "success" && (
-            <div className="flex flex-col items-center justify-center space-y-6 py-6 animate-in fade-in zoom-in-95 duration-500">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-accent/10 border border-accent/20">
-                <CheckCircle2 className="h-10 w-10 text-accent" />
+            <div className="flex flex-col items-center justify-center space-y-4 py-4 animate-in fade-in zoom-in-95 duration-500">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 border border-accent/20">
+                <GoogleIcon name="check_circle" size={28} className="text-accent" />
               </div>
               <div className="text-center">
-                <p className="text-muted-foreground mb-8">
+                <p className="text-xs text-muted-foreground mb-6">
                   Your password has been successfully reset. You can now use your new password to sign in.
                 </p>
-                <Button asChild className="group w-full h-12 bg-accent hover:bg-accent/90 text-background font-semibold text-base transition-all duration-300 shadow-[0_0_15px_rgba(var(--color-accent),0.3)] hover:shadow-[0_0_25px_rgba(var(--color-accent),0.5)]">
+                <Button asChild className="group w-full h-9 bg-accent hover:bg-accent/90 text-background font-semibold text-xs transition-colors rounded-lg shadow-sm">
                   <Link href="/login">
                     Back to Login
-                    <ArrowRight className="ml-2 h-5 w-5 opacity-70 group-hover:translate-x-1 transition-transform" />
+                    <GoogleIcon name="arrow_forward" size={14} className="ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
                 </Button>
               </div>

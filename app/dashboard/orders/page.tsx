@@ -3,6 +3,11 @@ import { redirect } from "next/navigation"
 import { Header } from "@/components/header"
 import { OrderHistory } from "@/components/order-history"
 
+export const metadata = {
+  title: "Order History - RayProxy Hub",
+  description: "View all your past proxy and email orders",
+}
+
 export default async function OrdersPage() {
   const session = await getSession()
 
@@ -14,12 +19,7 @@ export default async function OrdersPage() {
     <div className="min-h-screen bg-background">
       <Header user={{ email: session.user.email, name: session.user.name, role: session.user.role }} />
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Order History</h1>
-          <p className="mt-2 text-muted-foreground">View all your past orders</p>
-        </div>
-
+      <main className="container mx-auto px-3 sm:px-4 py-5 md:py-8 max-w-5xl">
         <OrderHistory />
       </main>
     </div>

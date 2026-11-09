@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { AlertTriangle } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 interface ConfirmDialogProps {
   open: boolean
@@ -39,13 +39,13 @@ export function ConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md border-border/50 bg-card">
         <DialogHeader className="space-y-4">
-          <div className="flex items-start gap-4">
-            <div className={`rounded-full bg-muted p-3 ${iconColor}`}>
-              <AlertTriangle className="h-6 w-6" />
+          <div className="flex items-start gap-3">
+            <div className={`rounded-lg bg-muted/60 p-2 ${iconColor} shrink-0`}>
+              <GoogleIcon name="warning" size={20} />
             </div>
-            <div className="space-y-2">
-              <DialogTitle className="text-lg font-bold">{title}</DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground">
+            <div className="space-y-1">
+              <DialogTitle className="text-sm font-semibold">{title}</DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
                 {description}
               </DialogDescription>
             </div>

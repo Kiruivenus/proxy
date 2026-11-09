@@ -1,7 +1,7 @@
 import { requireSuperAdmin } from "@/lib/auth"
 import { Header } from "@/components/header"
 import { SettingsForm } from "@/components/superadmin/settings-form"
-import { ShieldAlert } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 export default async function SettingsPage() {
   const user = await requireSuperAdmin()
@@ -11,13 +11,13 @@ export default async function SettingsPage() {
       <Header user={{ email: user.email, name: user.name, role: user.role }} />
 
       <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
-            <ShieldAlert className="h-6 w-6 text-accent" />
+        <div className="flex items-center gap-2.5 mb-6">
+          <div className="h-8 w-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+            <GoogleIcon name="shield_person" size={18} className="text-accent" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">SuperAdmin Settings</h1>
-            <p className="text-muted-foreground mt-1">Configure platform-wide subscription and limits</p>
+            <h1 className="text-xl font-bold tracking-tight">SuperAdmin Settings</h1>
+            <p className="text-xs text-muted-foreground">Configure platform-wide subscription and limits</p>
           </div>
         </div>
 

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Loader2, Copy, Check } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 import { Button } from "@/components/ui/button"
 
 interface Order {
@@ -82,7 +82,7 @@ export function OrderManagement() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <GoogleIcon name="progress_activity" size={24} className="animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -125,9 +125,9 @@ export function OrderManagement() {
                         onClick={() => handleCopyEmail(order.userEmail, order.id)}
                       >
                         {copiedId === order.id ? (
-                          <Check className="h-3 w-3 text-green-500" />
+                          <GoogleIcon name="check" size={13} className="text-emerald-400" />
                         ) : (
-                          <Copy className="h-3 w-3 text-muted-foreground" />
+                          <GoogleIcon name="content_copy" size={13} className="text-muted-foreground" />
                         )}
                       </Button>
                     </div>

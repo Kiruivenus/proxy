@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Loader2, Search, UserX, UserCheck, Shield, Users, ArrowUpRight, ArrowDownLeft, Wallet } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 
 interface User {
   id: string
@@ -129,7 +129,7 @@ export function UserManagement() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <GoogleIcon name="progress_activity" size={24} className="animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -137,37 +137,37 @@ export function UserManagement() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         <Card>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
-              <Users className="h-6 w-6 text-accent" />
+          <CardContent className="flex items-center gap-3 p-3.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
+              <GoogleIcon name="group" size={20} className="text-accent" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.total}</p>
-              <p className="text-sm text-muted-foreground">Total Users</p>
+              <p className="text-xl font-bold">{stats.total}</p>
+              <p className="text-xs text-muted-foreground">Total Users</p>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-              <UserX className="h-6 w-6 text-destructive" />
+          <CardContent className="flex items-center gap-3 p-3.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10">
+              <GoogleIcon name="person_off" size={20} className="text-destructive" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.banned}</p>
-              <p className="text-sm text-muted-foreground">Banned Users</p>
+              <p className="text-xl font-bold">{stats.banned}</p>
+              <p className="text-xs text-muted-foreground">Banned Users</p>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Shield className="h-6 w-6 text-primary" />
+          <CardContent className="flex items-center gap-3 p-3.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <GoogleIcon name="shield" size={20} className="text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.admins}</p>
-              <p className="text-sm text-muted-foreground">Admins</p>
+              <p className="text-xl font-bold">{stats.admins}</p>
+              <p className="text-xs text-muted-foreground">Admins</p>
             </div>
           </CardContent>
         </Card>
@@ -182,12 +182,12 @@ export function UserManagement() {
         <CardContent>
           <div className="mb-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <GoogleIcon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search by name or email..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="pl-9 h-9 text-xs"
               />
             </div>
           </div>
@@ -254,15 +254,15 @@ export function UserManagement() {
                             }}
                           >
                             {actionLoading === user.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <GoogleIcon name="progress_activity" size={14} className="animate-spin" />
                             ) : user.isBanned ? (
                               <>
-                                <UserCheck className="mr-1 h-4 w-4" />
+                                <GoogleIcon name="person_check" size={14} className="mr-1" />
                                 Unban
                               </>
                             ) : (
                               <>
-                                <UserX className="mr-1 h-4 w-4" />
+                                <GoogleIcon name="person_off" size={14} className="mr-1" />
                                 Ban
                               </>
                             )}
@@ -310,7 +310,7 @@ export function UserManagement() {
         <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col p-0 overflow-hidden">
           <DialogHeader className="p-6 pb-2">
             <DialogTitle className="flex items-center gap-2">
-              <Wallet className="h-5 w-5 text-primary" />
+              <GoogleIcon name="account_balance_wallet" size={18} className="text-primary" />
               Transaction History
             </DialogTitle>
             <DialogDescription>
@@ -321,13 +321,13 @@ export function UserManagement() {
           <div className="flex-1 overflow-y-auto p-6 pt-2">
             {loadingTransactions ? (
               <div className="flex flex-col items-center justify-center py-12 gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <GoogleIcon name="progress_activity" size={24} className="animate-spin text-muted-foreground" />
                 <p className="text-sm text-muted-foreground animate-pulse">Loading financial records...</p>
               </div>
             ) : transactions.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-2">
-                  <ArrowUpRight className="h-6 w-6 text-muted-foreground opacity-20" />
+                  <GoogleIcon name="north_east" size={20} className="text-muted-foreground opacity-30" />
                 </div>
                 <p className="font-medium">No transactions found</p>
                 <p className="text-sm text-muted-foreground">This user has not made any purchases or top-ups yet.</p>
@@ -338,7 +338,7 @@ export function UserManagement() {
                   <div key={t.id} className="flex items-center justify-between p-4 rounded-xl border bg-card hover:shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-4">
                       <div className={`h-10 w-10 rounded-full flex items-center justify-center ${t.isNegative ? 'bg-destructive/10 text-destructive' : 'bg-green-500/10 text-green-500'}`}>
-                        {t.isNegative ? <ArrowDownLeft className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
+                        {t.isNegative ? <GoogleIcon name="south_west" size={18} /> : <GoogleIcon name="north_east" size={18} />}
                       </div>
                       <div>
                         <p className="font-semibold">{t.description}</p>

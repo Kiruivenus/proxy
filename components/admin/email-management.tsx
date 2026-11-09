@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Loader2, Plus, Trash2, Mail, Edit2 } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 import { useToast } from "@/components/ui/use-toast"
@@ -326,7 +326,7 @@ export function EmailManagement() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <GoogleIcon name="progress_activity" size={24} className="animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -335,7 +335,7 @@ export function EmailManagement() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="rounded-full bg-destructive/10 p-4 mb-4">
-          <Mail className="h-12 w-12 text-destructive" />
+          <GoogleIcon name="mail" size={36} className="text-destructive" />
         </div>
         <h2 className="text-xl font-bold text-destructive">Error Loading Data</h2>
         <p className="text-muted-foreground mt-2">{error}</p>
@@ -354,8 +354,8 @@ export function EmailManagement() {
         <TabsContent value="domains" className="mt-6 space-y-6">
           <Dialog open={addDomainOpen} onOpenChange={setAddDomainOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button size="sm" className="h-8 text-xs gap-1.5">
+                <GoogleIcon name="add" size={15} />
                 Add Email Domain
               </Button>
             </DialogTrigger>
@@ -397,8 +397,8 @@ export function EmailManagement() {
                 )}
               </div>
               <DialogFooter>
-                <Button onClick={handleAddDomain} disabled={submitting}>
-                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button onClick={handleAddDomain} disabled={submitting} size="sm" className="h-8 text-xs">
+                  {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
                   Add Domain
                 </Button>
               </DialogFooter>
@@ -444,8 +444,8 @@ export function EmailManagement() {
                 )}
               </div>
               <DialogFooter>
-                <Button onClick={handleSaveEditDomain} disabled={submitting}>
-                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button onClick={handleSaveEditDomain} disabled={submitting} size="sm" className="h-8 text-xs">
+                  {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
                   Save Changes
                 </Button>
               </DialogFooter>
@@ -473,7 +473,7 @@ export function EmailManagement() {
                     {domains.map((domain) => (
                       <TableRow key={domain._id}>
                         <TableCell className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-accent" />
+                          <GoogleIcon name="mail" size={14} className="text-accent" />
                           {domain.domain}
                         </TableCell>
                         <TableCell>
@@ -483,11 +483,11 @@ export function EmailManagement() {
                         </TableCell>
                         <TableCell>{domain.server || "-"}</TableCell>
                         <TableCell className="flex gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEditDomain(domain)}>
-                            <Edit2 className="h-4 w-4 text-blue-500" />
+                          <Button variant="ghost" size="icon" onClick={() => handleEditDomain(domain)} className="h-8 w-8">
+                            <GoogleIcon name="edit" size={14} className="text-blue-500" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeleteDomain(domain._id)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteDomain(domain._id)} className="h-8 w-8">
+                            <GoogleIcon name="delete" size={14} className="text-destructive" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -502,8 +502,8 @@ export function EmailManagement() {
         <TabsContent value="emails" className="mt-6 space-y-6">
           <Dialog open={addEmailOpen} onOpenChange={setAddEmailOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button size="sm" className="h-8 text-xs gap-1.5">
+                <GoogleIcon name="add" size={15} />
                 Add Email Account
               </Button>
             </DialogTrigger>
@@ -547,8 +547,8 @@ export function EmailManagement() {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={handleAddEmail} disabled={submitting}>
-                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button onClick={handleAddEmail} disabled={submitting} size="sm" className="h-8 text-xs">
+                  {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
                   Add Email
                 </Button>
               </DialogFooter>
@@ -583,8 +583,8 @@ export function EmailManagement() {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={handleSaveEditEmail} disabled={submitting}>
-                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button onClick={handleSaveEditEmail} disabled={submitting} size="sm" className="h-8 text-xs">
+                  {submitting && <GoogleIcon name="progress_activity" size={14} className="mr-1.5 animate-spin" />}
                   Save Changes
                 </Button>
               </DialogFooter>
@@ -630,15 +630,17 @@ export function EmailManagement() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleEditEmail(email)}
+                            className="h-8 w-8"
                           >
-                            <Edit2 className="h-4 w-4 text-blue-500" />
+                            <GoogleIcon name="edit" size={14} className="text-blue-500" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => handleDeleteEmail(email.id)}
+                            className="h-8 w-8"
                           >
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <GoogleIcon name="delete" size={14} className="text-destructive" />
                           </Button>
                         </TableCell>
                       </TableRow>

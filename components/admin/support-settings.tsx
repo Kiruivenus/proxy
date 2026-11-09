@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Save } from "lucide-react"
+import { GoogleIcon } from "@/components/ui/google-icon"
 import { useToast } from "@/components/ui/use-toast"
 
 export function SupportSettings() {
@@ -77,7 +77,7 @@ export function SupportSettings() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="rounded-full bg-destructive/10 p-4 mb-4">
-          <Save className="h-12 w-12 text-destructive" />
+          <GoogleIcon name="error" size={40} className="text-destructive" />
         </div>
         <h2 className="text-xl font-bold text-destructive">Error Loading Settings</h2>
         <p className="text-muted-foreground mt-2">{error}</p>
@@ -87,7 +87,7 @@ export function SupportSettings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <GoogleIcon name="progress_activity" size={28} className="animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -146,9 +146,12 @@ export function SupportSettings() {
           </div>
 
           <div className="flex gap-3">
-            <Button onClick={handleSave} disabled={submitting} className="flex gap-2">
-              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              <Save className="h-4 w-4" />
+            <Button onClick={handleSave} disabled={submitting} size="sm" className="h-8 text-xs gap-1.5">
+              {submitting ? (
+                <GoogleIcon name="progress_activity" size={14} className="animate-spin" />
+              ) : (
+                <GoogleIcon name="save" size={15} />
+              )}
               Save Settings
             </Button>
           </div>
